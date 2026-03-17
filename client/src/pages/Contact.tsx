@@ -31,23 +31,23 @@ export default function Contact() {
     }
 
     try {
-      // EmailJS integration
-      // Reads env vars: VITE_EMAILJS_PUBLIC_KEY, VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID
-      const { default: emailjs } = await import("@emailjs/browser");
+      const formData = new FormData(form);
+      const response = await fetch("https://formspree.io/f/xreyoblz", {
+        method: "POST",
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
 
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-
-      if (!publicKey || !serviceId || !templateId) {
-        throw new Error("EmailJS environment variables not configured");
+      if (response.ok) {
+        setStatus("success");
+        form.reset();
+      } else {
+        throw new Error("Formspree submission failed");
       }
-
-      await emailjs.sendForm(serviceId, templateId, form, { publicKey });
-      setStatus("success");
-      form.reset();
     } catch (err) {
-      console.error("EmailJS error:", err);
+      console.error("Formspree error:", err);
       setStatus("error");
     }
   };
@@ -114,6 +114,8 @@ export default function Contact() {
               <form
                 ref={formRef}
                 onSubmit={handleSubmit}
+                action="https://formspree.io/f/xreyoblz"
+                method="POST"
                 className="space-y-5"
                 noValidate
               >
