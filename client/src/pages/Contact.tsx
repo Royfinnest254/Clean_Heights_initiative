@@ -14,6 +14,7 @@ const subjectOptions = [
 
 export default function Contact() {
   const [status, setStatus] = useState<FormStatus>("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -32,8 +33,9 @@ export default function Contact() {
 
     try {
       const data = Object.fromEntries(new FormData(form).entries());
+      const formspreeId = import.meta.env.VITE_FORMSPREE_ID || "xreyoblz";
       
-      const response = await fetch("https://formspree.io/f/xreyoblz", {
+      const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,14 +46,18 @@ export default function Contact() {
 
       if (response.ok) {
         setStatus("success");
+        setErrorMessage("");
         form.reset();
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Formspree submission failed");
+        const msg = errorData.error || (errorData.errors ? errorData.errors.map((e: any) => e.message).join(", ") : "Submission failed");
+        setErrorMessage(msg);
+        throw new Error(msg);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Formspree error:", err);
       setStatus("error");
+      if (!errorMessage) setErrorMessage(err.message || "An unexpected error occurred");
     }
   };
 
@@ -100,9 +106,10 @@ export default function Contact() {
                 <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                   <AlertCircle size={20} className="text-red-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-red-600">Something went wrong.</p>
-                    <p className="text-sm text-[#555555]">
-                      Please email us directly at{" "}
+                    <p className="font-semibold text-red-600">Submission Error</p>
+                    <p className="text-sm text-[#555555] mb-2">{errorMessage}</p>
+                    <p className="text-xs text-[#555555]">
+                       Please check your connection or contact us at{" "}
                       <a
                         href="mailto:cleanheightsinitiative@gmail.com"
                         className="underline text-[#2D6A4F]"
