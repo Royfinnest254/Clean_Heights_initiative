@@ -76,6 +76,9 @@ export default function Home() {
             src="/hero-bg.jpg"
             alt="Pristine Rift Valley escarpment panorama"
             className="w-full h-full object-cover"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
         </div>
         {/* Gradients for text legibility */}
@@ -188,6 +191,7 @@ export default function Home() {
                   alt="CHI team showing impact, Iten Elgeyo Marakwet"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
                   loading="lazy"
+                  decoding="async"
                 />
               </div>
 
@@ -198,6 +202,7 @@ export default function Home() {
                   alt="CHI field operations in progress"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
                   loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>

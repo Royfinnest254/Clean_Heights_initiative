@@ -113,6 +113,7 @@ export default function Milestones() {
                         alt={`${m.shortLocation} - Image ${pIdx + 1}`}
                         className="w-full h-auto grayscale-[0.2] hover:grayscale-0 transition-all duration-700"
                         loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   </div>

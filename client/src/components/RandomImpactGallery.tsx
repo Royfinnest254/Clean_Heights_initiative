@@ -52,30 +52,7 @@ export default function RandomImpactGallery() {
 
         <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 space-y-4">
           {randomPhotos.map((photo, idx) => (
-            <motion.div
-              key={`${photo.src}-${idx}`}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.05 }}
-              className="break-inside-avoid relative group overflow-hidden bg-[#F8FBF8] border border-[#E9EDEA]/10 shadow-sm hover:shadow-xl transition-all duration-700"
-            >
-              <img
-                src={photo.src}
-                alt={photo.alt}
-                className="w-full h-auto grayscale-[0.4] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 ease-out"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-4">
-                <div className="flex items-center gap-2 text-white/60 text-[8px] font-bold uppercase tracking-widest mb-1">
-                  <ImageIcon size={10} />
-                  Field Shot
-                </div>
-                <p className="text-white text-xs font-medium tracking-tight">
-                  {photo.location}
-                </p>
-              </div>
-            </motion.div>
+            <GalleryImage key={`${photo.src}-${idx}`} photo={photo} delay={idx * 0.05} />
           ))}
         </div>
         
@@ -84,5 +61,39 @@ export default function RandomImpactGallery() {
         </div>
       </div>
     </section>
+  );
+}
+
+function GalleryImage({ photo, delay }: { photo: any; delay: number }) {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ delay, duration: 0.5 }}
+      className="break-inside-avoid relative group overflow-hidden bg-[#F0F4F0] border border-[#E9EDEA]/10 shadow-sm hover:shadow-xl transition-all duration-700"
+    >
+      <img
+        src={photo.src}
+        alt={photo.alt}
+        onLoad={() => setLoaded(true)}
+        className={`w-full h-auto grayscale-[0.4] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 ease-out ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+        loading="lazy"
+        decoding="async"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-4">
+        <div className="flex items-center gap-2 text-white/60 text-[8px] font-bold uppercase tracking-widest mb-1">
+          <ImageIcon size={10} />
+          Field Shot
+        </div>
+        <p className="text-white text-xs font-medium tracking-tight">
+          {photo.location}
+        </p>
+      </div>
+    </motion.div>
   );
 }
