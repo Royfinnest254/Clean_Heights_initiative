@@ -31,20 +31,23 @@ export default function Contact() {
     }
 
     try {
-      const formData = new FormData(form);
+      const data = Object.fromEntries(new FormData(form).entries());
+      
       const response = await fetch("https://formspree.io/f/xreyoblz", {
         method: "POST",
-        body: formData,
         headers: {
-          'Accept': 'application/json'
-        }
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(data)
       });
 
       if (response.ok) {
         setStatus("success");
         form.reset();
       } else {
-        throw new Error("Formspree submission failed");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Formspree submission failed");
       }
     } catch (err) {
       console.error("Formspree error:", err);
