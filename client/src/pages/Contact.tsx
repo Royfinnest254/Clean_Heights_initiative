@@ -33,7 +33,7 @@ export default function Contact() {
 
     try {
       const data = Object.fromEntries(new FormData(form).entries());
-      const formspreeId = import.meta.env.VITE_FORMSPREE_ID || "xreyoblz";
+      const formspreeId = import.meta.env.VITE_FORMSPREE_ID || "myknnljk";
       
       const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
         method: "POST",
@@ -124,7 +124,7 @@ export default function Contact() {
               <form
                 ref={formRef}
                 onSubmit={handleSubmit}
-                action="https://formspree.io/f/xreyoblz"
+                action="https://formspree.io/f/myknnljk"
                 method="POST"
                 className="space-y-5"
                 noValidate
