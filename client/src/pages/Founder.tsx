@@ -3,8 +3,7 @@ import { Mail, Phone, MapPin, Droplets, Leaf, Users, ArrowRight } from "lucide-r
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
-const PORTRAIT_PLACEHOLDER =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663425159343/Uj3DVokpwmZufniMNHSrGB/E56gq8Y9NtBX_f55a709a.jpg";
+const PORTRAIT_PLACEHOLDER = "/founder-portrait.jpg";
 
 const values = [
   { icon: Droplets, label: "Water Source Protection" },
@@ -61,6 +60,9 @@ export default function Founder() {
                   src={PORTRAIT_PLACEHOLDER}
                   alt="Cynthia Jelagat — Founder and Chairperson of Clean Heights Initiative"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                 />
               </div>
               <div className="absolute top-8 -right-4 bg-[#C08A3E] text-white py-3 px-6 shadow-xl z-20">
