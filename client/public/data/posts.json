@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "title": "Scaling the Peaks: Our First Community Cleanup at Kapshoo",
+        "excerpt": "A deep dive into how 50 volunteers gathered to remove 200kg of waste from the Kapshoo Village hiking trails.",
+        "author": "Clean Heights Team",
+        "date": "April 25, 2026",
+        "category": "Community",
+        "image": "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&q=80&w=1200",
+        "content": "The morning sun was just beginning to hit the ridges of the Elgeyo Escarpment when our first team of volunteers arrived at Kapshoo Village. The energy was electric.\n\nOver the next six hours, our community members, ranging from local school children to elders, worked side-by-side to restore the natural beauty of the hiking trails. We weren't just picking up trash; we were reclaiming our landscape.\n\nBy the end of the day, we had collected over 200kg of non-biodegradable waste. This is just the beginning of the Clean Heights Initiative. Our next goal is to establish permanent waste collection points at all major trailheads."
+    },
+    {
+        "id": 2,
+        "title": "The Silent Guardians of the Kerio River",
+        "excerpt": "Meet the local guides who have dedicated their lives to protecting the water sources that sustain our valley.",
+        "author": "Jane Kiprotich",
+        "date": "April 20, 2026",
+        "category": "Impact",
+        "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=800",
+        "content": "Water is life. In the Kerio Valley, this is not just a saying; it is a daily reality. However, the river is under threat from pollution and deforestation.\n\nWe spent a week with the River Guardians, a group of local guides who patrol the banks and educate communities on sustainable farming practices near the water's edge."
+    }
+]

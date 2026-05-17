@@ -37,31 +37,22 @@ export default function StatCounter({
   }, [started]);
 
   useEffect(() => {
-    if (!started) return;
-
-    let start = 0;
-    const step = Math.ceil(value / (duration / 16));
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= value) {
-        setCount(value);
-        clearInterval(timer);
-      } else {
-        setCount(start);
-      }
-    }, 16);
-
-    return () => clearInterval(timer);
-  }, [started, value, duration]);
+    if (started) {
+      setCount(value);
+    }
+  }, [started, value]);
 
   return (
-    <div ref={ref} className="text-center">
-      <div className="stat-number text-white mb-2">
-        {prefix}
-        {count.toLocaleString()}
-        {suffix}
+    <div ref={ref} className="text-center group">
+      <div className="relative inline-flex items-center justify-center w-32 h-32 mb-6">
+        <div className="absolute inset-0 bg-[var(--chi-terracotta)]/10 organic-radius group-hover:scale-110 transition-transform duration-700" />
+        <div className="stat-number text-[var(--chi-forest)] relative z-10 font-bold">
+          {prefix}
+          {count.toLocaleString()}
+          {suffix}
+        </div>
       </div>
-      <p className="text-[#D8F3DC] font-medium text-sm uppercase tracking-widest">
+      <p className="text-[var(--chi-grey)] font-bold text-xs uppercase tracking-[0.2em] max-w-[120px] mx-auto leading-relaxed opacity-80">
         {label}
       </p>
     </div>

@@ -1,21 +1,49 @@
-import { useState, useRef, FormEvent } from "react";
-import { Mail, Phone, MapPin, Instagram, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { useState, useRef, useEffect, useCallback, FormEvent } from "react";
+import { Send, MapPin, Mail, Phone, ExternalLink } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import TopographicBg from "@/components/TopographicBg";
 
 type FormStatus = "idle" | "submitting" | "success" | "error";
 
 const subjectOptions = [
   "Partnership Enquiry",
   "Volunteer Interest",
+  "Support / Donation",
   "Media / Press",
   "General Enquiry",
 ];
+
+/* ── Scroll reveal hook ── */
+function useScrollReveal() {
+  const observe = useCallback(() => {
+    const els = document.querySelectorAll(
+      ".chi-reveal, .chi-reveal-left, .chi-reveal-scale"
+    );
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("chi-visible");
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => observe(), [observe]);
+}
 
 export default function Contact() {
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
+
+  useScrollReveal();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,194 +52,248 @@ export default function Contact() {
     const form = formRef.current;
     if (!form) return;
 
-    // Check honeypot (spam bot protection)
+    // Honeypot check
     const honeypot = form.querySelector<HTMLInputElement>('[name="website"]');
     if (honeypot?.value) {
+      // Silently fail for bots
       setStatus("idle");
       return;
     }
 
     try {
       const data = Object.fromEntries(new FormData(form).entries());
-      const formspreeId = import.meta.env.VITE_FORMSPREE_ID || "myknnljk";
-      
-      const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
+
+      const response = await fetch(`/contact.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json"
+          Accept: "application/json",
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
-      if (response.ok) {
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         setStatus("success");
         setErrorMessage("");
         form.reset();
       } else {
-        const errorData = await response.json();
-        const msg = errorData.error || (errorData.errors ? errorData.errors.map((e: any) => e.message).join(", ") : "Submission failed");
+        const msg = result.error || "Submission failed";
         setErrorMessage(msg);
         throw new Error(msg);
       }
     } catch (err: any) {
-      console.error("Formspree error:", err);
+      console.error("Contact form error:", err);
       setStatus("error");
-      if (!errorMessage) setErrorMessage(err.message || "An unexpected error occurred");
+      if (!errorMessage) {
+        setErrorMessage(err.message || "An unexpected error occurred");
+      }
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FBF8] text-[#1A1C1A]">
+    <div className="min-h-screen bg-[var(--chi-warm-white)] text-[var(--chi-charcoal)]">
       <Navigation />
 
       {/* ── Page Header ── */}
-      <section className="pt-32 pb-16 bg-white border-b border-[#E9EDEA]">
-        <div className="container mx-auto px-4">
-          <span className="text-[10px] font-extrabold uppercase tracking-[0.4em] text-[#C08A3E] mb-6 block">
-            Institutional Liaison
-          </span>
-          <h1 className="text-[#1B4332] mb-6 leading-tight">Channel for Partnership</h1>
-          <p className="text-[#4A4D4A] max-w-2xl text-lg leading-relaxed">
-            Formal communication channels for institutional partnerships, 
-            research collaboration, and community engagement. 
+      <section className="pt-32 pb-16 bg-white border-b border-[#E5DFD3] relative overflow-hidden">
+        <TopographicBg color="#A0522D" opacity={0.03} />
+        <div className="container mx-auto px-4 max-w-4xl text-center relative z-10">
+          <h6 className="text-[11px] font-extrabold uppercase tracking-[0.25em] text-[var(--chi-leaf)] mb-4 chi-reveal">
+            Partnerships & Contact
+          </h6>
+          <h1 className="text-[var(--chi-forest)] mb-6 leading-tight chi-reveal chi-delay-1">
+            Let's Restore the <br className="hidden sm:block" />
+            <span className="chi-shimmer">Escarpment Together</span>
+          </h1>
+          <p className="text-[var(--chi-grey)] text-lg leading-relaxed chi-reveal chi-delay-2 max-w-2xl mx-auto">
+            Whether you want to partner, volunteer, support, or collaborate —
+            we'd love to hear from you.
           </p>
         </div>
       </section>
 
-      {/* ── Form + Details ── */}
-      <section className="chi-section" aria-labelledby="contact-form-heading">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <div className="chi-glow-line" />
 
-            {/* Contact Form */}
-            <div>
-              <h2 id="contact-form-heading" className="text-[#1B4332] mb-10 text-3xl">
-                Enquiry Submission
-              </h2>
+      {/* ── Contact Options Grid ── */}
+      <section
+        id="info"
+        className="chi-section bg-[var(--chi-warm-white)] scroll-mt-28"
+        aria-labelledby="contact-ways-heading"
+      >
+        <div className="container mx-auto px-4 max-w-5xl">
+          <h2 id="contact-ways-heading" className="sr-only">
+            Ways to Contact Us
+          </h2>
 
-              {status === "success" && (
-                <div className="flex items-start gap-4 bg-[#F8FBF8] border-2 border-[#1B4332] p-8 mb-10">
-                  <CheckCircle size={24} className="text-[#1B4332] mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-semibold text-[#2D6A4F]">Message sent!</p>
-                    <p className="text-sm text-[#555555]">
-                      Thank you! We'll be in touch shortly.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {status === "error" && (
-                <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                  <AlertCircle size={20} className="text-red-500 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-semibold text-red-600">Submission Error</p>
-                    <p className="text-sm text-[#555555] mb-2">{errorMessage}</p>
-                    <p className="text-xs text-[#555555]">
-                       Please check your connection or contact us at{" "}
-                      <a
-                        href="mailto:cleanheightsinitiative@gmail.com"
-                        className="underline text-[#2D6A4F]"
-                      >
-                        cleanheightsinitiative@gmail.com
-                      </a>
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <form
-                ref={formRef}
-                onSubmit={handleSubmit}
-                action="https://formspree.io/f/myknnljk"
-                method="POST"
-                className="space-y-5"
-                noValidate
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+            <div className="diff-card text-center chi-reveal">
+              <div className="mb-4">
+                <Mail className="text-[var(--chi-terracotta)] mx-auto" size={24} />
+              </div>
+              <h3 className="text-[var(--chi-charcoal)] mb-2 text-lg">Email Us</h3>
+              <a
+                href="mailto:info@cleanheightsinitiative.org"
+                className="text-[var(--chi-grey)] hover:text-[var(--chi-forest)] text-sm transition-colors"
               >
-                {/* Honeypot — hidden from real users */}
-                <input
-                  type="text"
-                  name="website"
-                  aria-hidden="true"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  className="absolute opacity-0 pointer-events-none h-0 w-0"
-                />
+                info@cleanheightsinitiative.org
+              </a>
+            </div>
 
+            <div className="diff-card text-center chi-reveal chi-delay-1">
+              <div className="mb-4">
+                <MapPin className="text-[var(--chi-sage)] mx-auto" size={24} />
+              </div>
+              <h3 className="text-[var(--chi-charcoal)] mb-2 text-lg">HQ Location</h3>
+              <p className="text-[var(--chi-grey)] text-sm">
+                Iten, Elgeyo Marakwet <br />
+                Rift Valley, Kenya
+              </p>
+            </div>
+
+            <div className="diff-card text-center chi-reveal chi-delay-2">
+              <div className="mb-4">
+                <Phone className="text-[var(--chi-forest)] mx-auto" size={24} />
+              </div>
+              <h3 className="text-[var(--chi-charcoal)] mb-2 text-lg">Call Us</h3>
+              <a
+                href="tel:+254728576944"
+                className="text-[var(--chi-grey)] hover:text-[var(--chi-forest)] text-sm transition-colors"
+              >
+                +254 728 576 944
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Form Section ── */}
+      <section id="form" className="pb-24 bg-[var(--chi-warm-white)] scroll-mt-28" aria-labelledby="form-heading">
+        <div className="container mx-auto px-4 max-w-3xl">
+          <div className="bg-transparent border-t border-[#E5DFD3] pt-12 chi-reveal">
+            <h2 id="form-heading" className="text-[var(--chi-forest)] text-2xl mb-8">
+              Send us a Message
+            </h2>
+
+            {status === "success" && (
+              <div className="bg-[#E6F4EA] border border-[#2D6A4F] rounded-lg p-5 mb-8 text-[var(--chi-forest)]">
+                <p className="font-bold flex items-center gap-2">
+                  <ExternalLink size={18} />
+                  Message sent successfully!
+                </p>
+                <p className="text-sm mt-1">
+                  Thank you for reaching out. A member of our team will get
+                  back to you shortly.
+                </p>
+              </div>
+            )}
+
+            {status === "error" && (
+              <div className="bg-[#FDE8E8] border border-[#C81E1E] rounded-lg p-5 mb-8 text-[#9B1C1C]">
+                <p className="font-bold">Submission Failed</p>
+                <p className="text-sm mt-1 mb-2">{errorMessage}</p>
+                <p className="text-xs">
+                  Please try again or contact us directly at{" "}
+                  <a
+                    href="mailto:info@cleanheightsinitiative.org"
+                    className="underline hover:text-[#771D1D]"
+                  >
+                    info@cleanheightsinitiative.org
+                  </a>
+                </p>
+              </div>
+            )}
+
+            <form
+              ref={formRef}
+              onSubmit={handleSubmit}
+              className="space-y-6"
+              noValidate
+            >
+              {/* Honeypot field (hidden) */}
+              <input
+                type="text"
+                name="website"
+                aria-hidden="true"
+                tabIndex={-1}
+                autoComplete="off"
+                className="absolute opacity-0 pointer-events-none h-0 w-0"
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="from_name" className="text-[10px] font-extrabold uppercase tracking-widest text-[#1B4332] mb-2 block">
-                    Full Entity/Name <span className="text-[#C08A3E]">*</span>
+                  <label htmlFor="from_name" className="chi-label">
+                    Name *
                   </label>
                   <input
                     id="from_name"
                     name="from_name"
                     type="text"
-                    className="chi-input !rounded-none !border-[#E9EDEA] focus:!border-[#1B4332] !bg-white"
-                    placeholder="e.g. Jane Muthoni"
                     required
-                    minLength={2}
                     aria-required="true"
+                    className="chi-input"
+                    placeholder="Jane Doe"
                   />
                 </div>
-
                 <div>
-                  <label htmlFor="from_email" className="text-[10px] font-extrabold uppercase tracking-widest text-[#1B4332] mb-2 block">
-                    Official Email <span className="text-[#C08A3E]">*</span>
+                  <label htmlFor="from_email" className="chi-label">
+                    Email Address *
                   </label>
                   <input
                     id="from_email"
                     name="from_email"
                     type="email"
-                    className="chi-input !rounded-none !border-[#E9EDEA] focus:!border-[#1B4332] !bg-white"
-                    placeholder="liaison@organisation.com"
                     required
                     aria-required="true"
+                    className="chi-input"
+                    placeholder="jane@example.com"
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="phone" className="text-[10px] font-extrabold uppercase tracking-widest text-[#1B4332] mb-2 block">
-                      Direct Line <span className="text-[#4A4D4A] font-normal opacity-50">(optional)</span>
-                    </label>
-                    <input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      className="chi-input !rounded-none !border-[#E9EDEA] focus:!border-[#1B4332] !bg-white"
-                      placeholder="+254..."
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="organisation" className="text-[10px] font-extrabold uppercase tracking-widest text-[#1B4332] mb-2 block">
-                      Affiliation <span className="text-[#4A4D4A] font-normal opacity-50">(optional)</span>
-                    </label>
-                    <input
-                      id="organisation"
-                      name="organisation"
-                      type="text"
-                      className="chi-input !rounded-none !border-[#E9EDEA] focus:!border-[#1B4332] !bg-white"
-                      placeholder="NGO, Research, Corporate"
-                    />
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="subject" className="text-[10px] font-extrabold uppercase tracking-widest text-[#1B4332] mb-2 block">
-                    Nature of Enquiry <span className="text-[#C08A3E]">*</span>
+                  <label htmlFor="phone" className="chi-label">
+                    Phone (optional)
                   </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    className="chi-input"
+                    placeholder="+254 XXX XXX XXX"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="organisation" className="chi-label">
+                    Organization (optional)
+                  </label>
+                  <input
+                    id="organisation"
+                    name="organisation"
+                    type="text"
+                    className="chi-input"
+                    placeholder="Organization Name"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="subject" className="chi-label">
+                  Reason for Contact *
+                </label>
+                <div className="relative">
                   <select
                     id="subject"
                     name="subject"
-                    className="chi-input !rounded-none !border-[#E9EDEA] focus:!border-[#1B4332] !bg-white"
                     required
                     aria-required="true"
+                    className="chi-input appearance-none bg-no-repeat bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5%22%20stroke%3D%22%236B7B6B%22%20stroke-width%3D%222%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_1rem_center]"
                     defaultValue=""
                   >
                     <option value="" disabled>
-                      Select Department…
+                      Select an option...
                     </option>
                     {subjectOptions.map((opt) => (
                       <option key={opt} value={opt}>
@@ -220,138 +302,57 @@ export default function Contact() {
                     ))}
                   </select>
                 </div>
-
-                <div>
-                  <label htmlFor="message" className="text-[10px] font-extrabold uppercase tracking-widest text-[#1B4332] mb-2 block">
-                    Detailed Proposal / Enquiry <span className="text-[#C08A3E]">*</span>
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={8}
-                    className="chi-input !rounded-none !border-[#E9EDEA] focus:!border-[#1B4332] !bg-white resize-none"
-                    placeholder="Statement of interest…"
-                    required
-                    minLength={20}
-                    aria-required="true"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={status === "submitting"}
-                  className="chi-btn chi-btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed text-xs font-black uppercase tracking-[0.2em] py-5 px-10"
-                  id="contact-submit-btn"
-                >
-                  {status === "submitting" ? (
-                    <>
-                      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                      </svg>
-                      Transmitting…
-                    </>
-                  ) : (
-                    <>
-                      <Send size={16} />
-                      Transmit Enquiry
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
-
-            {/* Direct Contact Details */}
-            <div className="bg-white border border-[#E9EDEA] p-12">
-              <h2 className="text-[#1B4332] mb-12 text-3xl font-serif">
-                Headquarters
-              </h2>
-
-              <div className="space-y-12 mb-16">
-                <div className="flex items-start gap-6 group">
-                  <div className="w-12 h-12 rounded-none bg-[#F8FBF8] border border-[#E9EDEA] flex items-center justify-center flex-shrink-0 group-hover:border-[#C08A3E] transition-colors">
-                    <Mail size={18} className="text-[#1B4332]" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#C08A3E] mb-2 tracking-[0.2em]">Official Correspondence</p>
-                    <a
-                      href="mailto:cleanheightsinitiative@gmail.com"
-                      className="text-[#1A1C1A] font-bold text-sm tracking-tight hover:text-[#1B4332]"
-                    >
-                      cleanheightsinitiative@gmail.com
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-6 group">
-                  <div className="w-12 h-12 rounded-none bg-[#F8FBF8] border border-[#E9EDEA] flex items-center justify-center flex-shrink-0 group-hover:border-[#C08A3E] transition-colors">
-                    <Phone size={18} className="text-[#1B4332]" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#C08A3E] mb-2 tracking-[0.2em]">Primary Line</p>
-                    <a
-                      href="tel:+254728576944"
-                      className="text-[#1A1C1A] font-bold text-sm"
-                    >
-                      +254 728 576 944
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-6 group">
-                  <div className="w-12 h-12 rounded-none bg-[#F8FBF8] border border-[#E9EDEA] flex items-center justify-center flex-shrink-0 group-hover:border-[#C08A3E] transition-colors">
-                    <MapPin size={18} className="text-[#1B4332]" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#C08A3E] mb-2 tracking-[0.2em]">Operational Base</p>
-                    <p className="text-[#1A1C1A] font-bold text-sm">Iten, Elgeyo Marakwet, Kenya</p>
-                  </div>
-                </div>
               </div>
 
-              {/* Map embed */}
-              <div className="rounded-none overflow-hidden h-72 border border-[#E9EDEA]">
-                <iframe
-                  title="Iten, Elgeyo Marakwet County, Kenya map"
-                  src="https://www.openstreetmap.org/export/embed.html?bbox=35.47%2C0.57%2C35.55%2C0.66&layer=mapnik&marker=0.615%2C35.509"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  allowFullScreen
+              <div>
+                <label htmlFor="message" className="chi-label">
+                  Your Message *
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={6}
+                  required
+                  minLength={20}
+                  aria-required="true"
+                  className="chi-input resize-none"
+                  placeholder="Tell us how you'd like to get involved..."
                 />
               </div>
-              <p className="text-[#555555] text-xs mt-2 text-center">
-                Iten, Elgeyo Marakwet County, Kenya
-              </p>
 
-              {/* Social links */}
-              <div className="mt-8">
-                <p className="font-semibold text-[#1B1B1B] mb-3">Follow CHI</p>
-                <div className="flex items-center gap-3">
-                  <a
-                    href="https://www.instagram.com/clean_heights_initiative"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Clean Heights Initiative on Instagram"
-                    className="flex items-center gap-2 chi-btn chi-btn-outline text-sm py-2 px-4"
-                  >
-                    <Instagram size={16} />
-                    Instagram
-                  </a>
-                  {/* Facebook placeholder */}
-                  <span
-                    className="chi-btn chi-btn-outline text-sm py-2 px-4 opacity-40 cursor-not-allowed"
-                    aria-label="Facebook (coming soon)"
-                    title="Coming soon"
-                  >
-                    Facebook
-                  </span>
-                </div>
-              </div>
-            </div>
+              <button
+                type="submit"
+                disabled={status === "submitting"}
+                className={`chi-btn w-full justify-center ${
+                  status === "submitting"
+                    ? "bg-gray-300 cursor-not-allowed border-gray-300 text-gray-600"
+                    : "chi-btn-primary"
+                }`}
+              >
+                {status === "submitting" ? (
+                  "Sending..."
+                ) : (
+                  <>
+                    Send Message <Send size={16} />
+                  </>
+                )}
+              </button>
+            </form>
           </div>
         </div>
+      </section>
+
+      {/* ── Map Section ── */}
+      <section id="map" className="h-[400px] w-full relative border-t border-[#E5DFD3] scroll-mt-28">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63832.61051515286!2d35.47413695277717!3d0.67566196232591!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1781b0a701b22e1b%3A0x67feec3b3bbdf340!2sIten%2C%20Kenya!5e0!3m2!1sen!2sus!4v1711718816913!5m2!1sen!2sus"
+          width="100%" 
+          height="100%" 
+          loading="lazy" 
+          referrerPolicy="no-referrer-when-downgrade" 
+          className="border-0 grayscale contrast-125 opacity-90 hover:grayscale-0 transition-all duration-700"
+          title="Clean Heights Initiative Location in Iten, Elgeyo Marakwet"
+        />
       </section>
 
       <Footer />

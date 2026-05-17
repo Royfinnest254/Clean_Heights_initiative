@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storyteller Suite | Clean Heights Initiative</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Premium Navigation -->
+    <nav class="glass-nav">
+        <div class="nav-container">
+            <a href="https://cleanheightsinitiative.org" class="back-link">← Back to Main Site</a>
+            <a href="https://blog.cleanheightsinitiative.org" class="logo-container" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663425159343/Uj3DVokpwmZufniMNHSrGB/chi-logo-final_2d6d3417.png" alt="CHI Logo" style="height: 38px; width: auto; display: block; object-fit: contain;">
+                <div class="logo" style="margin: 0;">STORYTELLER<span>SUITE</span></div>
+            </a>
+            <div class="nav-right">
+                <span class="location-tag">Elgeyo Marakwet, Kenya</span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section: Featured Story -->
+        <section id="hero" class="hero-section">
+            <div id="featured-story-container" class="featured-story">
+                <!-- Dynamically loaded -->
+                <div class="loading-shimmer"></div>
+            </div>
+        </section>
+
+        <!-- Stories Grid -->
+        <section class="stories-section">
+            <div class="section-header">
+                <h2>Latest Field Reports</h2>
+                <p>Authentic stories from the front lines of conservation.</p>
+            </div>
+            <div id="stories-grid" class="stories-grid">
+                <!-- Dynamically loaded -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Full Screen Reader Mode (Hidden by default) -->
+    <div id="reader-overlay" class="reader-overlay hidden">
+        <button id="close-reader" class="close-btn">&times;</button>
+        <div class="reader-content-container">
+            <div id="reader-content" class="reader-content"></div>
+        </div>
+    </div>
+
+    <footer class="blog-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Clean Heights Initiative. All rights reserved.</p>
+            <p>Stories from the heart of the Rift Valley.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

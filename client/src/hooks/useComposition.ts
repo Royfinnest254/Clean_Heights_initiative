@@ -11,7 +11,7 @@ export interface UseCompositionReturn<
 }
 
 export interface UseCompositionOptions<
-  T extends HTMLInputElement | HTMLTextAreaElement,
+  T extends HTMLInputElement |HTMLTextAreaElement,
 > {
   onKeyDown?: React.KeyboardEventHandler<T>;
   onCompositionStart?: React.CompositionEventHandler<T>;

@@ -58,7 +58,7 @@ export default function Lightbox({
       {/* Close */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 text-white/80 hover:text-white bg-black/30 hover:bg-black/60 rounded-full p-2 transition-colors"
+        className="absolute top-4 right-4 z-10 text-white/80 hover:text-white bg-black/30 hover:bg-black/60 rounded-full p-2"
         aria-label="Close lightbox"
       >
         <X size={22} />
@@ -68,7 +68,7 @@ export default function Lightbox({
       {photos.length > 1 && (
         <button
           onClick={(e) => { e.stopPropagation(); onPrev(); }}
-          className="absolute left-3 sm:left-6 z-10 text-white/80 hover:text-white bg-black/30 hover:bg-black/60 rounded-full p-3 transition-colors"
+          className="absolute left-3 sm:left-6 z-10 text-white/80 hover:text-white bg-black/30 hover:bg-black/60 rounded-full p-3"
           aria-label="Previous photo"
         >
           <ChevronLeft size={24} />
@@ -108,7 +108,7 @@ export default function Lightbox({
       {photos.length > 1 && (
         <button
           onClick={(e) => { e.stopPropagation(); onNext(); }}
-          className="absolute right-3 sm:right-6 z-10 text-white/80 hover:text-white bg-black/30 hover:bg-black/60 rounded-full p-3 transition-colors"
+          className="absolute right-3 sm:right-6 z-10 text-white/80 hover:text-white bg-black/30 hover:bg-black/60 rounded-full p-3"
           aria-label="Next photo"
         >
           <ChevronRight size={24} />

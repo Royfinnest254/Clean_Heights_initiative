@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -40,22 +41,31 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  /* CHI Custom Tokens */
+  --font-bebas: 'Bebas Neue', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
+  --font-playfair: 'Playfair Display', serif;
 }
 
 :root {
-  /* CHI Design System — § 6.1 Colour Palette (Premium NGO Overhaul) */
-  --chi-primary:   #1B4332; /* Deep Forest */
-  --chi-secondary: #40916C; 
-  --chi-light:     #D8F3DC;
-  --chi-pale:      #F8FBF8; /* Warm Off-white */
-  --chi-accent:    #C08A3E; /* Muted Gold/Earth */
-  --chi-dark:      #1A1C1A; /* Charcoal */
-  --chi-mid-grey:  #4A4D4A;
-  --chi-white:     #FFFFFF;
+  /* CHI Design System — Escarpment / Earth Palette */
+  --chi-forest:     #1B4332;
+  --chi-forest-mid: #2D6A4F;
+  --chi-sage:       #40916C;
+  --chi-leaf:       #52B788;
+  --chi-mint:       #D8F3DC;
+  --chi-cream:      #FFFCF5;
+  --chi-warm-white: #FDFCF8; /* Parchment */
+  --chi-terracotta: #C14424; /* Sedona Rust */
+  --chi-earth:      #A0522D;
+  --chi-gold:       #C08A3E;
+  --chi-charcoal:   #1A1C1A;
+  --chi-slate:      #3D4A3D;
+  --chi-grey:       #6B7B6B;
 
-  /* Tailwind / shadcn tokens mapped to CHI palette */
-  --radius: 0.25rem; /* Sharper borders for institutional feel */
-  --background: #F8FBF8;
+  /* Tailwind / shadcn tokens */
+  --radius: 0.75rem; /* Softened radius */
+  --background: #FAF8F3;
   --foreground: #1A1C1A;
   --card: #FFFFFF;
   --card-foreground: #1A1C1A;
@@ -63,29 +73,67 @@
   --popover-foreground: #1A1C1A;
   --primary: #1B4332;
   --primary-foreground: #FFFFFF;
-  --secondary: #E9EDEA;
+  --secondary: #F0EDE6;
   --secondary-foreground: #1B4332;
-  --muted: #E9EDEA;
-  --muted-foreground: #4A4D4A;
-  --accent: #C08A3E;
+  --muted: #F0EDE6;
+  --muted-foreground: #6B7B6B;
+  --accent: #C76F3B;
   --accent-foreground: #FFFFFF;
   --destructive: #9B2226;
-  --border: #DDE4DE;
+  --border: #E5DFD3;
   --input: #FFFFFF;
   --ring: #1B4332;
-  --sidebar: #F8FBF8;
-  --sidebar-foreground: #1A1C1A;
-  --sidebar-primary: #1B4332;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E9EDEA;
-  --sidebar-accent-foreground: #1A1C1A;
-  --sidebar-border: #DDE4DE;
-  --sidebar-ring: #1B4332;
-  --chart-1: #1B4332;
-  --chart-2: #2D6A4F;
-  --chart-3: #B58463;
-  --chart-4: #997B66;
-  --chart-5: #C08A3E;
+  --sidebar: #FAF8F3;
+}
+
+/* ── Noise Texture Overlay ── */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.025;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ── Animations ── */
+@keyframes chi-fade-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes chi-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes chi-scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes chi-slide-right {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes chi-counter-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes chi-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes chi-glow-line {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 @layer base {
@@ -96,25 +144,45 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
+    font-family: var(--font-outfit);
+    font-size: 17px; /* Slightly larger for readability */
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-playfair);
     font-weight: 700;
-    color: var(--chi-primary);
+    color: var(--chi-forest);
     line-height: 1.15;
     letter-spacing: -0.01em;
   }
 
-  h1 { font-size: clamp(2.75rem, 6vw, 4rem); font-weight: 800; }
-  h2 { font-size: clamp(2.25rem, 5vw, 2.75rem); font-weight: 700; }
-  h3 { font-size: clamp(1.5rem, 3vw, 1.75rem); font-weight: 600; }
+  /* Rugged primary header */
+  h1 { 
+    font-family: var(--font-bebas);
+    font-size: clamp(3rem, 8vw, 5.5rem); 
+    font-weight: 400; 
+    letter-spacing: 0.02em;
+    line-height: 0.95;
+  }
+  
+  h2 { 
+    font-family: var(--font-playfair);
+    font-size: clamp(2.25rem, 5vw, 3.75rem); 
+    font-weight: 900; 
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
 
-  p { line-height: 1.7; font-weight: 400; color: #333; }
+  h3 { 
+    font-family: var(--font-playfair);
+    font-size: clamp(1.5rem, 3vw, 2.25rem); 
+    font-weight: 700; 
+    line-height: 1.2;
+  }
+
+  p { line-height: 1.8; font-weight: 400; color: var(--chi-slate); opacity: 0.9; }
 
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -122,6 +190,7 @@
   [type="submit"]:not(:disabled),
   a[href] { cursor: pointer; }
 }
+
 
 @layer components {
   .container {
@@ -140,117 +209,175 @@
     .container { padding-left: 2.5rem; padding-right: 2.5rem; }
   }
 
+  /* ── Organic & Human Touches ── */
+  .organic-radius {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
+
+  .paper-card {
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    border: 1px solid rgba(229, 223, 211, 0.5);
+  }
+
+  .hand-etched {
+    position: relative;
+    display: inline-block;
+  }
+  .hand-etched::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--chi-terracotta);
+    opacity: 0.4;
+    border-radius: 40% 60% 50% 50% / 30% 30% 70% 70%;
+    transform: rotate(-1deg);
+  }
+
   /* ── CHI Button ── */
   .chi-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.75rem;
-    border-radius: 6px;
+    padding: 0.875rem 2.25rem;
+    border-radius: 12px 8px 14px 10px; /* Irregular for human feel */
     font-weight: 600;
     font-size: 0.9375rem;
-    letter-spacing: 0.01em;
-    transition: all 0.2s ease;
-    border: 2px solid transparent;
-    text-decoration: none;
+    letter-spacing: 0.02em;
     line-height: 1;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1.5px solid transparent;
   }
 
   .chi-btn-primary {
-    background-color: var(--chi-primary);
+    background-color: var(--chi-forest);
     color: #fff;
-    border-color: var(--chi-primary);
-    border-radius: 4px;
+    border-color: var(--chi-forest);
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
+    font-weight: 700;
   }
   .chi-btn-primary:hover {
     background-color: #0d281e;
     border-color: #0d281e;
-    transform: none;
-    box-shadow: 0 4px 12px rgba(27,67,50,0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(27,67,50,0.25);
+  }
+
+  .chi-btn-terracotta {
+    background-color: var(--chi-terracotta);
+    color: #fff;
+    border-color: var(--chi-terracotta);
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .chi-btn-terracotta:hover {
+    background-color: #A85A2A;
+    border-color: #A85A2A;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(199,111,59,0.3);
   }
 
   .chi-btn-outline {
     background-color: transparent;
-    color: #2D6A4F;
-    border-color: #2D6A4F;
+    color: var(--chi-forest-mid);
+    border-color: var(--chi-forest-mid);
   }
   .chi-btn-outline:hover {
-    background-color: #2D6A4F;
+    background-color: var(--chi-forest-mid);
     color: #fff;
+    transform: translateY(-2px);
   }
 
   .chi-btn-white {
-    background-color: #fff;
-    color: #2D6A4F;
-    border-color: #fff;
+    background-color: rgba(255,255,255,0.2);
+    color: #fff;
+    border-color: rgba(255,255,255,0.4);
+    backdrop-filter: blur(4px); /* Reduced blur for less 'AI' look */
   }
   .chi-btn-white:hover {
-    background-color: #D8F3DC;
-    border-color: #D8F3DC;
+    background-color: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.7);
+    transform: translateY(-2px);
   }
 
   .chi-btn-outline-white {
     background-color: transparent;
     color: #fff;
-    border-color: rgba(255,255,255,0.7);
+    border-color: rgba(255,255,255,0.5);
   }
   .chi-btn-outline-white:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255,255,255,0.12);
     border-color: #fff;
+    transform: translateY(-2px);
   }
 
   /* ── CHI Sections ── */
-  .chi-section { padding: 5rem 0; }
-  .chi-section-sm { padding: 3rem 0; }
+  .chi-section { padding: 6rem 0; }
+  .chi-section-sm { padding: 3.5rem 0; }
 
   /* ── Pill badge ── */
   .chi-badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
+    padding: 0.375rem 1rem;
     border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.7rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
   }
 
-  /* ── Pillar Card ── */
+  /* ── Pillar Card (Escarpment Resilience Model) ── */
   .pillar-card {
-    background: #fff;
-    padding: 2.5rem;
-    border: 1px solid #E9EDEA;
-    box-shadow: none;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 2.5rem 0;
+    border-top: 2px solid #E5DFD3;
+    transition: border-color 0.4s ease;
+    position: relative;
+    overflow: hidden;
   }
   .pillar-card:hover {
-    border-color: var(--chi-accent);
-    transform: translateY(-4px);
+    border-top-color: var(--chi-terracotta);
   }
 
-  /* ── Stat Number ── */
+  /* ── Differentiator card ── */
+  .diff-card {
+    padding: 1.5rem 0;
+    transition: all 0.35s ease;
+    position: relative;
+    border-bottom: 1.5px solid transparent;
+  }
+  .diff-card:hover {
+    border-bottom-color: var(--chi-sage);
+  }
+
+  /* ── Stat Number (Impact) ── */
   .stat-number {
-    font-size: clamp(3rem, 7vw, 4rem);
+    font-size: clamp(3rem, 7vw, 4.5rem);
     font-weight: 800;
     line-height: 1;
+    font-family: 'Playfair Display', serif;
   }
 
   /* ── Activity Table ── */
   .chi-table { width: 100%; border-collapse: collapse; }
   .chi-table th {
-    background: #2D6A4F;
+    background: var(--chi-forest-mid);
     color: #fff;
     padding: 0.75rem 1rem;
     text-align: left;
     font-size: 0.875rem;
     font-weight: 600;
   }
-  .chi-table td { padding: 0.75rem 1rem; font-size: 0.9rem; border-bottom: 1px solid #D8F3DC; }
+  .chi-table td { padding: 0.75rem 1rem; font-size: 0.9rem; border-bottom: 1px solid var(--chi-mint); }
   .chi-table tr:nth-child(even) td { background: #F0FAF4; }
-  .chi-table tr.totals-row td { font-weight: 700; background: #D8F3DC; border-top: 2px solid #2D6A4F; }
 
   /* ── Lightbox ── */
   .lightbox-overlay {
@@ -266,16 +393,8 @@
 
   /* ── Milestone card ── */
   .milestone-card {
-    background: #fff;
-    border-radius: 10px;
+    background: transparent;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-    cursor: pointer;
-  }
-  .milestone-card:hover {
-    box-shadow: 0 6px 24px rgba(0,0,0,0.14);
-    transform: translateY(-3px);
   }
 
   /* ── Photo strip scrollable ── */
@@ -288,13 +407,13 @@
     -webkit-overflow-scrolling: touch;
   }
   .photo-strip::-webkit-scrollbar { height: 4px; }
-  .photo-strip::-webkit-scrollbar-track { background: #D8F3DC; border-radius: 2px; }
-  .photo-strip::-webkit-scrollbar-thumb { background: #2D6A4F; border-radius: 2px; }
+  .photo-strip::-webkit-scrollbar-track { background: var(--chi-mint); border-radius: 2px; }
+  .photo-strip::-webkit-scrollbar-thumb { background: var(--chi-forest-mid); border-radius: 2px; }
 
   .photo-strip-item {
     flex: 0 0 280px;
     scroll-snap-align: start;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     position: relative;
   }
@@ -302,41 +421,104 @@
   /* ── Form ── */
   .chi-input {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1.5px solid #B7E4C7;
-    border-radius: 6px;
+    padding: 0.875rem 1.125rem;
+    border: 1.5px solid #E5DFD3;
+    border-radius: 8px;
     font-size: 0.9375rem;
     background: #fff;
-    color: #1B1B1B;
+    color: var(--chi-charcoal);
     font-family: inherit;
-    transition: border-color 0.2s;
+    transition: border-color 0.25s, box-shadow 0.25s;
     outline: none;
   }
-  .chi-input:focus { border-color: #2D6A4F; box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
+  .chi-input:focus {
+    border-color: var(--chi-forest-mid);
+    box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+  }
   .chi-label {
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #1B1B1B;
+    color: var(--chi-charcoal);
     margin-bottom: 0.375rem;
   }
 
   /* ── Nav scroll state ── */
   .nav-scrolled {
-    background: rgba(255,255,255,0.97) !important;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 1px 12px rgba(0,0,0,0.08);
+    background: rgba(250,248,243,0.97) !important;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 1px 16px rgba(0,0,0,0.06);
+  }
+
+  /* ── Glow line separator replaced with solid divider ── */
+  .chi-glow-line {
+    height: 1px;
+    background: var(--chi-terracotta);
+    opacity: 0.15;
   }
 }
 
-/* ── Animations ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ── Print Stability ── */
+@media print {
+  .chi-reveal, .chi-reveal-left, .chi-reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    transition: none !important;
+  }
+  
+  .chi-visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
-@keyframes countUp { from { opacity: 0; } to { opacity: 1; } }
 
-.animate-fade-up { animation: fadeUp 0.7s ease forwards; }
-.animate-fade-up-delay-1 { animation: fadeUp 0.7s 0.15s ease both; }
-.animate-fade-up-delay-2 { animation: fadeUp 0.7s 0.3s ease both; }
-.animate-fade-up-delay-3 { animation: fadeUp 0.7s 0.5s ease both; }
+/* ── Scroll reveal utility ── */
+.chi-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.chi-reveal.chi-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.chi-reveal-left {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.chi-reveal-left.chi-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.chi-reveal-scale {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.chi-reveal-scale.chi-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Stagger delays */
+.chi-delay-1 { transition-delay: 0.1s; }
+.chi-delay-2 { transition-delay: 0.2s; }
+.chi-delay-3 { transition-delay: 0.3s; }
+.chi-delay-4 { transition-delay: 0.4s; }
+
+/* ── Hover lift (disabled) ── */
+.chi-hover-lift {
+  transition: opacity 0.3s ease;
+}
+.chi-hover-lift:hover {
+  opacity: 0.85;
+}
+
+/* ── Shimmer text (disabled) ── */
+.chi-shimmer {
+  color: var(--chi-terracotta);
+}

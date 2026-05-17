@@ -107,3 +107,13 @@ temp/
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
+
+# Custom local ignores
+blog_subdomain/admin/config.php
+blog_subdomain.zip
+production_build_final.zip
+dist_ultra_optimized/
+oldhome.txt
+.aiignore
+.manus-logs/
+ideas.md

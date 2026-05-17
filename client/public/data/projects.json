@@ -1,0 +1,41 @@
+[
+  {
+    "id": "tree-planting-escarpment",
+    "title": "Indigenous Tree Planting & Nursery",
+    "status": "Brainstorming & Active",
+    "category": "Reforestation",
+    "description": "Nurturing native tree seedlings in our community nurseries and planting them across degraded parts of the Elgeyo Marakwet escarpment to prevent landslides and restore forest cover.",
+    "icon": "TreePine",
+    "ideas": [
+      "Grow and distribute 5,000 native seedlings by end of the season",
+      "Engage local schools in conservation runs and walks",
+      "Scale up women-led community tree nurseries"
+    ]
+  },
+  {
+    "id": "water-catchment-protection",
+    "title": "Water Trough & Catchment Cleaning",
+    "status": "Brainstorming & Active",
+    "category": "Water Security",
+    "description": "Cleaning and restoring rural water troughs used by local residents and livestock. We are brainstorming ways to install simple sand filters and plant indigenous reeds to naturally purify water.",
+    "icon": "Droplet",
+    "ideas": [
+      "Restore 3 major community water troughs along key paths",
+      "Establish local water user committees for long-term maintenance",
+      "Filter out silt and mud to keep local drinking water safe"
+    ]
+  },
+  {
+    "id": "sustainable-eco-tourism",
+    "title": "Bridging Tourism & Conservation",
+    "status": "Brainstorming & Active",
+    "category": "Eco-Tourism",
+    "description": "Designing community-led guided trails along the escarpment where visitors participate directly in planting a tree. We are merging Iten's legendary high-altitude running culture with nature conservation.",
+    "icon": "Compass",
+    "ideas": [
+      "Map out 2 official eco-tourism trails around Iten",
+      "Train local youth as eco-guides to share escarpment history",
+      "Incorporate conservation milestones directly into runner training camps"
+    ]
+  }
+]
