@@ -10,32 +10,30 @@ const navLinks = [
     label: "Our Work", 
     href: "/milestones",
     dropdownItems: [
-      { label: "Kipgorgotich Clean-up", href: "/milestones#kipgorgotich-april-2026" },
-      { label: "Kapshoo Tree Planting", href: "/milestones#kapshoo-tree-planting-2026" },
-      { label: "Kapshoo Water Cleaning", href: "/milestones#kapshoo-water-cleaning-2026" },
-      { label: "Simba Oldoldol", href: "/milestones#simba-oldoldol" },
-      { label: "Oldoldol Catchment", href: "/milestones#oldoldol" },
-      { label: "Kipkorgotich Water Point", href: "/milestones#kipkorgotich" },
-      { label: "Iten Public Park", href: "/milestones#iten-park" },
-      { label: "Kamebur Viewpoint", href: "/milestones#kamebur" }
+      { label: "Kamariny (Water Source & Tree Planting)", href: "/milestones#kamariny-water-source-protection-2026" },
+      { label: "Kipgorgotich (Water Point & Clean-up)", href: "/milestones#kipgorgotich-april-2026" },
+      { label: "Kapshoo (Tree Planting & Cleaning)", href: "/milestones#kapshoo-tree-planting-2026" },
+      { label: "Oldoldol (Simba Group & Catchment)", href: "/milestones#simba-oldoldol" },
+      { label: "Iten Town (Park & Reserve)", href: "/milestones#iten-park" },
+      { label: "Kamebur Viewpoint (Escarpment Clean-up)", href: "/milestones#kamebur" }
     ]
   },
   { 
     label: "About", 
     href: "/about",
     dropdownItems: [
-      { label: "Our Story & Vision", href: "/about#about-heading" },
-      { label: "Core Values", href: "/about#values" },
-      { label: "Meet the Founder", href: "/about#founder" }
+      { label: "Our Story & Vision", href: "/about" },
+      { label: "Meet the Founder", href: "/about#founder" },
+      { label: "Our Team", href: "/team" },
+      { label: "Eco-Tourism Trails", href: "/ecotourism" }
     ]
   },
   { 
     label: "Get Involved", 
     href: "/contact",
     dropdownItems: [
-      { label: "Contact Info & HQ", href: "/contact#info" },
-      { label: "Send us a Message", href: "/contact#form" },
-      { label: "HQ Location Map", href: "/contact#map" }
+      { label: "Contact Info & HQ", href: "/contact" },
+      { label: "Send us a Message", href: "/contact#form" }
     ]
   }
 ];
