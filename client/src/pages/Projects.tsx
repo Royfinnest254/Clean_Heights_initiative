@@ -150,18 +150,10 @@ export default function Projects() {
             We are always open to new brainstorming suggestions! If you see a degraded landscape, 
             a water trough in need of cleaning, or have ideas for eco-tourism around Iten, please reach out to us.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Link href="/contact" className="chi-btn chi-btn-outline inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold uppercase tracking-wider">
+          <div className="flex justify-center items-center">
+            <Link href="/contact" className="chi-btn chi-btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold uppercase tracking-wider">
               Share Your Idea <ArrowRight size={15} />
             </Link>
-            <a
-              href="https://www.mchanga.africa/fundraiser/138903"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="chi-btn chi-btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold uppercase tracking-wider"
-            >
-              Support Our M-Changa Fundraiser
-            </a>
           </div>
         </div>
       </section>
