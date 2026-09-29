@@ -69,7 +69,7 @@ On the Node app's details page, find **Add Variable** or **Environment Variables
 
 Use a password manager to make the setup key. Save it privately for the next step; do not send it to me or put it in GitHub. Click **Save** if shown.
 
-On that same Node app page, click **Run NPM Install**. Wait for it to finish. The repository includes an `.npmrc` setting that handles the older dependency peer range, so there should be no extra command to type. If cPanel displays a red error, stop and send a screenshot with secrets hidden.
+On that same Node app page, click **Run NPM Install**. Wait for it to finish. The incompatible development-only Vite plugin has been removed, so npm can resolve the project normally. If cPanel displays a red error, stop and send a screenshot with secrets hidden.
 
 ## G. Deploy the website and connect the API
 
