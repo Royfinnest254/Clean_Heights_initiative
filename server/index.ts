@@ -105,6 +105,87 @@ async function requireAdmin(req: Request, res: Response, next: NextFunction) {
 const adminApi = express.Router();
 adminApi.use(noStore);
 
+// First-admin bootstrap is browser-based for cPanel users without Terminal.
+// It can only create the account while the CMS has no administrators and
+// requires a temporary secret configured in the Node.js app environment.
+adminApi.get("/setup-status", async (_req, res, next) => {
+  try {
+    const [rows] = await pool.query("SELECT COUNT(*) AS admins FROM cms_admins");
+    const hasAdmins = Number((rows as { admins: number }[])[0]?.admins || 0) > 0;
+    const secret = process.env.CMS_SETUP_KEY || "";
+    res.json({ available: !hasAdmins && secret.length >= 32 });
+  } catch (error) { next(error); }
+});
+
+adminApi.post("/setup", async (req, res, next) => {
+  const secret = process.env.CMS_SETUP_KEY || "";
+  const suppliedSecret = String(req.body?.setupKey || "");
+  if (secret.length < 32 || suppliedSecret.length > 256) {
+    res.status(403).json({ error: "First-time setup is not available. Check the setup instructions or sign in." });
+    return;
+  }
+  const ipHash = hash(String(req.ip || "unknown"));
+  const setupEmailHash = hash("clean-heights-initial-admin-setup");
+  try {
+    const [attemptRows] = await pool.execute(
+      "SELECT COUNT(*) AS failures FROM cms_login_attempts WHERE email_hash=? AND ip_hash=? AND succeeded=0 AND attempted_at > UTC_TIMESTAMP() - INTERVAL 15 MINUTE",
+      [setupEmailHash, ipHash],
+    );
+    if (Number((attemptRows as { failures: number }[])[0]?.failures || 0) >= 5) {
+      res.status(429).json({ error: "Too many setup-key attempts. Wait 15 minutes and try again." });
+      return;
+    }
+  } catch (error) { next(error); return; }
+  const expected = Buffer.from(hash(secret), "hex");
+  const supplied = Buffer.from(hash(suppliedSecret), "hex");
+  if (!timingSafeEqual(expected, supplied)) {
+    try { await pool.execute("INSERT INTO cms_login_attempts(email_hash,ip_hash,succeeded) VALUES(?,?,0)", [setupEmailHash, ipHash]); }
+    catch (error) { next(error); return; }
+    res.status(403).json({ error: "The setup key does not match the key in the hosting app settings." });
+    return;
+  }
+  const email = String(req.body?.email || "").trim().toLowerCase().slice(0, 254);
+  const displayName = String(req.body?.displayName || "").trim().slice(0, 160);
+  const password = String(req.body?.password || "");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || displayName.length < 2 || password.length < 14 || password.length > 1024) {
+    res.status(400).json({ error: "Enter a valid email, a name of at least 2 characters, and a password of at least 14 characters." });
+    return;
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    const [lockRows] = await connection.query("SELECT GET_LOCK('clean_heights_first_admin', 10) AS acquired");
+    if (Number((lockRows as { acquired: number }[])[0]?.acquired) !== 1) {
+      res.status(503).json({ error: "Setup is busy. Wait a moment and try again." });
+      return;
+    }
+    const [countRows] = await connection.query("SELECT COUNT(*) AS admins FROM cms_admins");
+    if (Number((countRows as { admins: number }[])[0]?.admins || 0) > 0) {
+      res.status(409).json({ error: "An administrator already exists. Sign in at the content portal." });
+      return;
+    }
+    const salt = randomBytes(16).toString("hex");
+    const passwordKey = (await scrypt(password, salt, 64)) as Buffer;
+    await connection.execute(
+      "INSERT INTO cms_admins(email,display_name,password_hash,active) VALUES(?,?,?,1)",
+      [email, displayName, `scrypt$${salt}$${passwordKey.toString("hex")}`],
+    );
+    res.status(201).json({ ok: true, message: "Administrator created. Remove CMS_SETUP_KEY in cPanel, restart the app, then sign in." });
+  } catch (error) {
+    if ((error as { code?: string })?.code === "ER_DUP_ENTRY") {
+      res.status(409).json({ error: "That email already has an account." });
+      return;
+    }
+    next(error);
+  } finally {
+    if (connection) {
+      try { await connection.query("SELECT RELEASE_LOCK('clean_heights_first_admin')"); } catch { /* connection may already be closed */ }
+      connection.release();
+    }
+  }
+});
+
 adminApi.post("/login", async (req, res, next) => {
   try {
     const email = String(req.body?.email || "").trim().toLowerCase().slice(0, 254);

@@ -143,7 +143,7 @@ export default function AdminPage() {
         <label className="mt-6 block text-sm font-semibold">Email<input className={`${fieldClass} mt-2`} type="email" autoComplete="username" required value={login.email} onChange={(e) => setLogin({ ...login, email: e.target.value })} /></label>
         <label className="mt-4 block text-sm font-semibold">Password<input className={`${fieldClass} mt-2`} type="password" autoComplete="current-password" required value={login.password} onChange={(e) => setLogin({ ...login, password: e.target.value })} /></label>
         <button disabled={busy} className="mt-6 w-full rounded-lg bg-[#1B4332] px-4 py-3 font-bold text-white disabled:opacity-50">{busy ? "Signing in…" : "Sign in"}</button>
-        <p className="mt-4 text-xs leading-5 text-[#68746A]">Administrator accounts are created by the site owner from the hosting terminal. There is no public registration form.</p>
+        <p className="mt-4 text-xs leading-5 text-[#68746A]">First time here? <Link href="/admin/setup" className="font-semibold text-[#315D3A] underline">Set up the first administrator</Link>. Setup closes automatically after the first account is created.</p>
       </form>
     </main>
   );

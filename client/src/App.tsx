@@ -16,6 +16,7 @@ import Programs from "./pages/Programs";
 import { SiteImagesProvider } from "./contexts/SiteImagesContext";
 import Team from "./pages/Team";
 import EcoTourism from "./pages/EcoTourism";
+import AdminSetupPage from "./pages/AdminSetupPage";
 
 function Router() {
   return (
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/accessibility" component={() => <LegalPage page="accessibility" />} />
       <Route path="/programs" component={Programs} />
       <Route path="/admin" component={AdminPage} />
+      <Route path="/admin/setup" component={AdminSetupPage} />
 
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
