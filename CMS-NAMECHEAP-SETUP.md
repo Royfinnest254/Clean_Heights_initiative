@@ -1,6 +1,6 @@
 # Beginner setup: Clean Heights on Namecheap cPanel
 
-This guide uses the cPanel buttons and browser screens. It does not require Terminal. Take one stage at a time. Do not deploy until you have made backups and confirmed that the domain document root shown in cPanel is `public_html`; the deployment file currently copies the built site there.
+This guide uses the cPanel buttons and browser screens. It does not require Terminal. Take one stage at a time. Back up the site before changing its app routing. The Node app serves the built pages and original public images directly; deployment does not copy the large image archive into `public_html`.
 
 ## What happens once
 
@@ -22,7 +22,7 @@ Namecheap's basic Stellar plan cannot restore a full cPanel backup itself; conta
 
 Use cPanel search and make sure these appear: **Git Version Control**, **Setup Node.js App**, **MySQL Database Wizard**, **phpMyAdmin**, and **File Manager**. This process does not use Terminal. If a required item is missing, stop and ask Namecheap Support whether it is enabled for this hosting account.
 
-In cPanel search **Domains**, click the result, and find `cleanheightsinitiative.org`. Read the **Document Root** column. It must say `public_html` for the deployment file as currently configured. If it shows a different folder, stop here and ask me before deploying; the deployment target needs to be changed first.
+In cPanel search **Domains**, click the result, and find `cleanheightsinitiative.org`. Note the **Document Root** shown there. cPanel's generated Passenger `.htaccess` must be in that domain's document root and the Node app URL must be set to the domain root. Do not copy website files manually into another folder.
 
 ## C. Create the new CMS database
 
@@ -80,7 +80,7 @@ Before installing, fetch the fixed project version: search cPanel for **Git Vers
 3. Open **Pull or Deploy**.
 4. Click **Update from Remote**, wait for completion, then click **Deploy HEAD Commit**.
 5. If cPanel says deployment failed, stop and send a screenshot; do not try random commands.
-6. **Do not find or edit `.htaccess`.** The text you shared already contains cPanel's `PassengerBaseURI "/"` block for this Node app. That block routes requests for the whole site, including the CMS API, to the app. There is no proxy snippet to add.
+6. **Do not find or edit `.htaccess`.** cPanel's `PassengerBaseURI "/"` block routes requests for the whole site, including the CMS API, to the app. There is no proxy snippet to add.
 7. The block is managed by cPanel. To change its Node version, use the **Setup Node.js App** screen; do not edit the generated Passenger lines in File Manager.
 8. Return to **Setup Node.js App** and click **Restart** for this app after install and deployment.
 
@@ -95,6 +95,8 @@ Before installing, fetch the fixed project version: search cPanel for **Git Vers
 ## After the setup
 
 For a future code update: I push it to GitHub, then you click **Update from Remote** and **Deploy HEAD Commit** in cPanel Git Version Control. Restart the Node app if the update changes the server. Publishing a program or uploading an image in `/admin` does not require a Git deployment.
+
+The first cPanel clone can take longer because the repository contains a large photo archive (about 293 MB of Git history at the time this guide was updated). Later **Update from Remote** operations usually fetch only new changes. **Deploy HEAD Commit** builds the app but no longer copies the full photo archive into the website folder.
 
 The privacy, cookie, terms, and accessibility pages are drafts and need review against the organisation's actual practices and Kenyan legal requirements. The image manager currently controls its wired page slots and program/activity images; news and milestone gallery images still need to be connected to those controls.
 

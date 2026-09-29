@@ -410,6 +410,14 @@ app.use(express.static(staticPath, { index: false, maxAge: "1h", setHeaders: (re
   if (filePath.includes(`${path.sep}assets${path.sep}`) && /-[\w-]{6,}\.(js|css|woff2?)$/i.test(filePath)) res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
   else if (/\.html?$/i.test(filePath)) res.setHeader("Cache-Control", "no-cache, must-revalidate");
 } }));
+// Large original images and other public files stay in the repository and are
+// served from here; Vite's build no longer copies this archive into dist.
+if (staticPath !== sourceStaticPath) {
+  app.use(express.static(sourceStaticPath, { index: false, maxAge: "1h", setHeaders: (res, filePath) => {
+    if (filePath.includes(`${path.sep}assets${path.sep}`) && /-[\w-]{6,}\.(js|css|woff2?)$/i.test(filePath)) res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    else if (/\.html?$/i.test(filePath)) res.setHeader("Cache-Control", "no-cache, must-revalidate");
+  } }));
+}
 app.get("*", (_req, res) => {
   res.setHeader("Cache-Control", "no-cache, must-revalidate");
   res.sendFile(path.join(staticPath, "index.html"));

@@ -27,9 +27,9 @@ The portal is available at `/admin`. It uses email/password login, scrypt passwo
 
 ## Deploy to Namecheap
 
-Follow [CMS-NAMECHEAP-SETUP.md](CMS-NAMECHEAP-SETUP.md). In summary, create a cPanel MySQL database, import the schema, clone this repo outside the public document root, configure a Node.js app, set its database configuration privately, install packages with the cPanel app button, create the first administrator in the protected browser setup page, and deploy the compiled public files through Git Version Control. No Terminal is required.
+Follow [CMS-NAMECHEAP-SETUP.md](CMS-NAMECHEAP-SETUP.md). In summary, create a cPanel MySQL database, import the schema, clone this repo outside the public document root, configure a Node.js app, set its database configuration privately, install packages with the cPanel app button, create the first administrator in the protected browser setup page, and deploy the Node app through Git Version Control. No Terminal is required.
 
-The site deploys by pushing changes to GitHub, using **Update from Remote** and **Deploy HEAD Commit** in cPanel Git Version Control, then restarting the Node app when backend code changes. CMS content edits are published from the browser and do not require a Git deployment.
+The site deploys by pushing changes to GitHub, using **Update from Remote** and **Deploy HEAD Commit** in cPanel Git Version Control, then restarting the Node app when backend code changes. The build does not duplicate the large `client/public` image archive into `public_html`; the Node server delivers those files directly from the repository. CMS content edits are published from the browser and do not require a Git deployment.
 
 ## Legal and privacy content
 

@@ -165,6 +165,9 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Keep the original photo archive in client/public and serve it at runtime
+    // instead of copying hundreds of MB into dist on every build.
+    copyPublicDir: false,
   },
   server: {
     port: 3000,
