@@ -8,7 +8,7 @@ This repository contains the React and TypeScript public website and the Node.js
 - `server/index.ts` — Express API, administrator sessions, media processing, cache headers, and static fallback for local/runtime use.
 - `database/schema.sql` — initial MariaDB/MySQL schema.
 - `scripts/create-admin.mjs` — interactive one-time administrator creation/reset; never stores the password in source.
-- `client/public/.htaccess` — HTTPS, SPA, security and cache rules. `client/public/.htaccess.cms-proxy.example` contains the two API/media proxy rules which need the port cPanel assigns to the Node application.
+- `client/public/.htaccess` — HTTPS, SPA, security and cache rules. On Namecheap, the cPanel-managed Passenger block routes the root site to the Node app; keep that generated block intact.
 - `.cpanel.yml` and [CMS-NAMECHEAP-SETUP.md](CMS-NAMECHEAP-SETUP.md) — cPanel Git deployment and first-time setup instructions.
 
 ## CMS content structure

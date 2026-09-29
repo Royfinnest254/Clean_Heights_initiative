@@ -47,11 +47,13 @@ In cPanel search **Domains**, click the result, and find `cleanheightsinitiative
 
 1. Search cPanel for **Setup Node.js App** and open it.
 2. Click **Create Application**.
-3. Select **Node.js 22** if available and **Production** mode.
+3. Select **Node.js 22** (22.12 or newer) if available and **Production** mode. Vite 7 cannot build on the Node 18 version shown in the `.htaccess` text you shared.
 4. Enter `clean_heights_app` as **Application root**. It must exactly match the repository path above.
-5. For **Application URL**, choose the domain `cleanheightsinitiative.org` and an unused path such as `cms-engine` if the form requires a path. This is the Node app's cPanel route; the public API will be connected separately in step G.
+5. For **Application URL**, choose `cleanheightsinitiative.org` at the root (leave the path empty if cPanel allows it). Your current Passenger configuration attaches the Node app to `/`, so do not put it under a subfolder.
 6. Enter `startup.js` as the **Application startup file**. This small file starts the built server after the first deployment.
 7. Click **Create**. Leave the app details page open.
+
+If you already created this app using Node 18, return to the **Setup Node.js App** list, click the pencil/edit icon on the `clean_heights_app` row, change **Node.js version** to **22**, and click **Save**. cPanel updates its Passenger settings automatically. Do not type over the generated Passenger block in `.htaccess`.
 
 ## F. Add settings and install packages using cPanel
 
@@ -69,25 +71,18 @@ On the Node app's details page, find **Add Variable** or **Environment Variables
 
 Use a password manager to make the setup key. Save it privately for the next step; do not send it to me or put it in GitHub. Click **Save** if shown.
 
-On that same Node app page, click **Run NPM Install**. Wait for it to finish. The incompatible development-only Vite plugin has been removed, so npm can resolve the project normally. If cPanel displays a red error, stop and send a screenshot with secrets hidden.
+Before installing, fetch the fixed project version: search cPanel for **Git Version Control**, open **Manage** for `clean_heights_app`, click **Pull or Deploy**, then click **Update from Remote**. After it finishes, return to **Setup Node.js App** and click **Run NPM Install**. Wait for it to finish. The incompatible development-only Vite plugin has been removed, so npm can resolve the project normally. If cPanel displays a red error, stop and send a screenshot with secrets hidden.
 
-## G. Deploy the website and connect the API
+## G. Deploy the website
 
 1. Return to **Git Version Control** in cPanel.
 2. Find `clean_heights_app` and click **Manage**.
 3. Open **Pull or Deploy**.
 4. Click **Update from Remote**, wait for completion, then click **Deploy HEAD Commit**.
 5. If cPanel says deployment failed, stop and send a screenshot; do not try random commands.
-6. Open **File Manager**. In its settings enable **Show Hidden Files** if `.htaccess` is not visible.
-7. Open `public_html/.htaccess` and make a copy/download before editing. Keep the existing contents.
-8. Open the repository file `client/public/.htaccess.cms-proxy.example` in GitHub. Copy these two rules into `public_html/.htaccess` after the HTTPS redirect and before the SPA fallback. Replace `12345` with the port displayed in **Setup Node.js App**:
-
-   ```apache
-   RewriteCond %{REQUEST_URI} ^/(api|media)(/|$)
-   RewriteRule ^(api|media)(/.*)?$ http://127.0.0.1:12345/$1$2 [P,L]
-   ```
-
-9. Save `.htaccess`. Return to **Setup Node.js App** and click **Restart** for this app.
+6. **Do not find or edit `.htaccess`.** The text you shared already contains cPanel's `PassengerBaseURI "/"` block for this Node app. That block routes requests for the whole site, including the CMS API, to the app. There is no proxy snippet to add.
+7. The block is managed by cPanel. To change its Node version, use the **Setup Node.js App** screen; do not edit the generated Passenger lines in File Manager.
+8. Return to **Setup Node.js App** and click **Restart** for this app after install and deployment.
 
 ## H. Create your administrator in the browser
 

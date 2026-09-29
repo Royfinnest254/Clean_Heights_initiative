@@ -1,5 +1,0 @@
-# Add these rules near the top of public_html/.htaccess after the HTTPS redirect.
-# Replace 12345 with the port shown for this application in cPanel > Setup Node.js App.
-# Keep this block above the SPA fallback rewrite.
-RewriteCond %{REQUEST_URI} ^/(api|media)(/|$)
-RewriteRule ^(api|media)(/.*)?$ http://127.0.0.1:12345/$1$2 [P,L]
