@@ -373,6 +373,13 @@ adminApi.put("/image-slots/:key", requireAdmin, async (req, res, next) => {
 
 app.use("/api/admin", adminApi);
 
+// Liveness check that does not depend on MySQL. This makes it possible to
+// distinguish a Passenger/startup failure from a database configuration issue.
+app.get("/api/health/live", (_req, res) => {
+  res.setHeader("Cache-Control", "no-store, private");
+  res.json({ ok: true, service: "clean-heights" });
+});
+
 app.get("/api/health", async (_req, res) => {
   res.setHeader("Cache-Control", "no-store, private");
   try { await pool.query("SELECT 1"); res.json({ ok: true, database: "connected" }); }

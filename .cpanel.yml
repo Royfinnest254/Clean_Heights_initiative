@@ -4,6 +4,7 @@ deployment:
     - export NODE_ENV=production
     - 'export PATH="$HOME/nodevenv/clean_heights_app/22/bin:$PATH"'
     - npm run build
+    - 'test -f dist/index.js && test -f dist/public/index.html'
     - '/bin/mkdir -p "$HOME/public_html"'
     - 'for path in dist/public/* dist/public/.[!.]*; do [ -e "$path" ] || continue; [ "$(basename "$path")" = ".htaccess" ] && continue; /bin/cp -a "$path" "$HOME/public_html/"; done'
     - '[ -f "$HOME/public_html/.htaccess" ] || /bin/cp -a dist/public/.htaccess "$HOME/public_html/.htaccess"'

@@ -97,3 +97,18 @@ Before installing, fetch the fixed project version: search cPanel for **Git Vers
 For a future code update: I push it to GitHub, then you click **Update from Remote** and **Deploy HEAD Commit** in cPanel Git Version Control. Restart the Node app if the update changes the server. Publishing a program or uploading an image in `/admin` does not require a Git deployment.
 
 The privacy, cookie, terms, and accessibility pages are drafts and need review against the organisation's actual practices and Kenyan legal requirements. The image manager currently controls its wired page slots and program/activity images; news and milestone gallery images still need to be connected to those controls.
+
+## If the site shows “503 Service Unavailable”
+
+Use these two browser checks after a deployment and app restart:
+
+1. Open `https://cleanheightsinitiative.org/api/health/live`.
+   - **JSON with `"ok":true`** means the Node app started and Passenger is reaching it.
+   - A **LiteSpeed 503 page** means this is still an app startup, Passenger mapping, or deployment problem. Database settings are not the next thing to change.
+2. If the liveness URL returns JSON, open `https://cleanheightsinitiative.org/api/health`.
+   - **JSON with `"database":"connected"`** means both app and database are reachable.
+   - **JSON with `"database":"unavailable"`** means the app is running, so check the database name, username, password, host, privileges, and whether `database/schema.sql` was imported.
+
+If the liveness URL gives a LiteSpeed page, open **cPanel → Metrics → Errors** immediately after refreshing it. Also open **Setup Node.js App** and verify that the application named `clean_heights_app` is set to Node.js **22**, application root `clean_heights_app`, startup file `startup.js`, and URL at the domain root. The Node version must match the Passenger path that cPanel generated in `.htaccess`; do not edit that block manually. In **Git Version Control → Manage → Pull or Deploy**, confirm **Update from Remote** and **Deploy HEAD Commit** both report success. The deployment must create `dist/index.js`; the deployment script now fails if that output or the built website is missing.
+
+The browser-visible search results for filenames such as `undici-types/errors...` are package files, not application logs. Do not change database credentials based on those filenames. Share only the text of the relevant cPanel error entry or a screenshot with passwords and environment variable values hidden.
