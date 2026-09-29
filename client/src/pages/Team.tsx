@@ -3,6 +3,8 @@ import { Link } from "wouter";
 import { ArrowLeft, User, MessageCircle } from "lucide-react";
 import TopographicBg from "@/components/TopographicBg";
 import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
+import { useSiteImage } from "@/contexts/SiteImagesContext";
 
 interface TeamMember {
   id: string;
@@ -12,6 +14,11 @@ interface TeamMember {
   bio: string;
   photo: string;
   quote?: string;
+}
+
+function MemberPhoto({ member, className }: { member: TeamMember; className: string }) {
+  const image = useSiteImage(`team.${member.id}.photo`, member.photo, member.name);
+  return <img src={image.src} alt={image.alt || member.name} className={className} loading="lazy" decoding="async" />;
 }
 
 /* ── Scroll reveal ── */
@@ -63,6 +70,7 @@ export default function Team() {
 
   return (
     <div className="min-h-screen bg-[var(--chi-warm-white)] font-sans selection:bg-[var(--chi-sage)] selection:text-white">
+      <Navigation />
       {/* Header */}
       <section className="relative py-24 lg:py-32 overflow-hidden bg-[var(--chi-forest)] text-white">
         <TopographicBg color="#ffffff" opacity={0.05} />
@@ -93,11 +101,7 @@ export default function Team() {
             <div key={member.id} className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center chi-reveal">
               <div className="lg:col-span-5">
                 <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl group border-4 border-white mb-8 lg:mb-0">
-                  <img 
-                    src={member.photo} 
-                    alt={member.name} 
-                    className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                  />
+                  <MemberPhoto member={member} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[var(--chi-forest)]/40 to-transparent" />
                 </div>
               </div>
@@ -141,7 +145,7 @@ export default function Team() {
                 <div key={m.id} className="bg-[var(--chi-warm-white)] p-8 rounded-2xl border border-[#E5DFD3] hover:shadow-xl transition-all chi-reveal-scale">
                   <div className="w-16 h-16 rounded-full bg-[var(--chi-forest)]/5 flex items-center justify-center mb-6">
                      {m.photo ? (
-                        <img src={m.photo} className="w-full h-full rounded-full object-cover" />
+                        <MemberPhoto member={m} className="w-full h-full rounded-full object-cover" />
                      ) : (
                         <User className="text-[var(--chi-forest)]" size={32} />
                      )}
@@ -174,7 +178,7 @@ export default function Team() {
               {field.map((m) => (
                 <div key={m.id} className="chi-reveal-scale">
                   <div className="relative aspect-square rounded-2xl overflow-hidden mb-4 shadow-sm border border-[#E5DFD3]">
-                     <img src={m.photo} className="w-full h-full object-cover" />
+                     <MemberPhoto member={m} className="w-full h-full object-cover" />
                   </div>
                   <h5 className="font-bold text-[var(--chi-forest)]">{m.name}</h5>
                   <p className="text-[10px] font-bold text-[var(--chi-grey)] uppercase">{m.role}</p>

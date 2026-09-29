@@ -4,6 +4,7 @@ import { ArrowRight, Leaf, ShieldCheck, Heart } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import TopographicBg from "@/components/TopographicBg";
+import { useSiteImage } from "@/contexts/SiteImagesContext";
 
 const PORTRAIT_PLACEHOLDER = "/founder-portrait.jpg";
 
@@ -34,6 +35,7 @@ function useScrollReveal() {
 }
 
 export default function About() {
+  const founderPortrait = useSiteImage("about.founder", PORTRAIT_PLACEHOLDER, "Cynthia Jelagat — Founder and Chairperson of Clean Heights Initiative");
   useScrollReveal();
 
   return (
@@ -193,8 +195,8 @@ export default function About() {
                 <div className="absolute -inset-3 border-2 border-[var(--chi-terracotta)]/20 z-0 rounded-2xl" />
                 <div className="relative z-10 overflow-hidden rounded-2xl shadow-2xl h-[600px]">
                   <img
-                    src={PORTRAIT_PLACEHOLDER}
-                    alt="Cynthia Jelagat — Founder and Chairperson of Clean Heights Initiative"
+                    src={founderPortrait.src}
+                    alt={founderPortrait.alt || "Cynthia Jelagat — Founder and Chairperson of Clean Heights Initiative"}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     loading="lazy"
                   />

@@ -20,6 +20,7 @@ import Footer from "@/components/Footer";
 import StatCounter from "@/components/StatCounter";
 import RandomImpactGallery from "@/components/RandomImpactGallery";
 import TopographicBg from "@/components/TopographicBg";
+import { useSiteImage, ManagedImage } from "@/contexts/SiteImagesContext";
 import ComparisonSlider from "@/components/ComparisonSlider";
 
 /* ── Scroll reveal hook ── */
@@ -156,6 +157,8 @@ interface BlogPost {
 
 export default function Home() {
   const aboutRef = useRef<HTMLElement>(null);
+  const heroImage = useSiteImage("home.hero", "/hero-bg.jpg", "Kipgorgotich Escarpment");
+  const communityImage = useSiteImage("home.community", "/impact-group.jpg", "Community women working at the CHI indigenous tree nursery");
   const [news, setNews] = useState<BlogPost[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
 
@@ -208,8 +211,8 @@ export default function Home() {
         {/* Real High-Resolution Raw Photograph */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/hero-bg.jpg"
-            alt="Kipgorgotich Escarpment"
+            src={heroImage.src}
+            alt={heroImage.alt || "Kipgorgotich Escarpment"}
             className="w-full h-full object-cover transform-gpu backface-hidden"
             loading="eager"
             style={{
@@ -533,8 +536,8 @@ export default function Home() {
                 <div className="absolute -bottom-6 -right-6 w-24 h-24 border-b-2 border-r-2 border-[var(--chi-sage)] z-0 rounded-br-3xl opacity-40" />
                 <div className="relative z-10 overflow-hidden rounded-3xl shadow-2xl">
                   <img
-                    src="/impact-group.jpg"
-                    alt="Community women working at the CHI indigenous tree nursery"
+                    src={communityImage.src}
+                    alt={communityImage.alt || "Community women working at the CHI indigenous tree nursery"}
                     className="w-full h-[520px] object-cover hover:scale-105 transition-transform duration-1000"
                     loading="lazy"
                     decoding="async"
@@ -797,7 +800,8 @@ export default function Home() {
               className="inline-block group"
               aria-label="Visit Shoe4Africa website"
             >
-              <img
+              <ManagedImage
+                slot="home.partner.shoe4africa"
                 src="/partners/shoe4africa.png"
                 alt="Shoe4Africa Logo"
                 className="h-28 md:h-36 object-contain group-hover:scale-110 transition-transform duration-500"
@@ -810,7 +814,8 @@ export default function Home() {
               className="inline-block group"
               aria-label="Visit NEMA website"
             >
-              <img
+              <ManagedImage
+                slot="home.partner.nema"
                 src="/partners/nema.png"
                 alt="NEMA Logo"
                 className="h-24 md:h-32 object-contain group-hover:scale-110 transition-transform duration-500"
@@ -823,7 +828,8 @@ export default function Home() {
               className="inline-block group"
               aria-label="Visit Elgeyo Marakwet County Government website"
             >
-              <img
+              <ManagedImage
+                slot="home.partner.elgeyo-marakwet"
                 src="/partners/elgeyo-marakwet.png"
                 alt="Elgeyo Marakwet County Logo"
                 className="h-28 md:h-36 object-contain group-hover:scale-110 transition-transform duration-500"
@@ -836,7 +842,8 @@ export default function Home() {
               className="inline-block group"
               aria-label="Visit The Swiss Side website"
             >
-              <img
+              <ManagedImage
+                slot="home.partner.swiss-side"
                 src="/partners/the-swiss-side.png"
                 alt="The Swiss Side Training Camp Logo"
                 className="h-28 md:h-36 object-contain group-hover:scale-110 transition-transform duration-500 rounded-2xl shadow-sm"

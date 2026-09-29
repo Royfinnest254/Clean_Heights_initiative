@@ -1,0 +1,8 @@
+---
+deployment:
+  tasks:
+    - export NODE_ENV=production
+    - npm run build
+    - '/bin/mkdir -p "$HOME/public_html"'
+    - 'for path in dist/public/* dist/public/.[!.]*; do [ -e "$path" ] || continue; [ "$(basename "$path")" = ".htaccess" ] && continue; /bin/cp -a "$path" "$HOME/public_html/"; done'
+    - '[ -f "$HOME/public_html/.htaccess" ] || /bin/cp -a dist/public/.htaccess "$HOME/public_html/.htaccess"'

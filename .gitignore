@@ -104,6 +104,8 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+storage/media/*
+!storage/media/.gitkeep
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/

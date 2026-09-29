@@ -24,4 +24,9 @@
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
+  <url><loc>https://cleanheightsinitiative.org/programs</loc></url>
+  <url><loc>https://cleanheightsinitiative.org/privacy</loc></url>
+  <url><loc>https://cleanheightsinitiative.org/cookies</loc></url>
+  <url><loc>https://cleanheightsinitiative.org/terms</loc></url>
+  <url><loc>https://cleanheightsinitiative.org/accessibility</loc></url>
 </urlset>

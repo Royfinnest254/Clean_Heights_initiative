@@ -53,9 +53,33 @@ Options -Indexes
 # 8. Hide Server Information
 ServerSignature Off
 
-# 9. Cache Control for static assets (Speeds up loading)
+# 9. Cache policy: revalidate HTML so releases appear promptly; keep fingerprinted
+# Vite bundles for a year. Mutable CMS media and PHP responses are never immutable.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html?)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+    <FilesMatch "\.(php)$">
+        Header set Cache-Control "no-store, private"
+    </FilesMatch>
+    <FilesMatch "\.(png|jpe?g|webp|gif|svg|ico|avif|woff2?)$">
+        Header set Cache-Control "public, max-age=604800, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_setenvif.c>
+    SetEnvIf Request_URI "^/assets/.+\.(js|css|woff2?)$" CHI_FINGERPRINTED_ASSET
+</IfModule>
+<IfModule mod_headers.c>
+    Header set Cache-Control "public, max-age=31536000, immutable" env=CHI_FINGERPRINTED_ASSET
+</IfModule>
+
 <IfModule mod_expires.c>
     ExpiresActive On
-    ExpiresDefault "access plus 1 month"
     ExpiresByType text/html "access plus 0 seconds"
+    ExpiresByType application/json "access plus 0 seconds"
+    ExpiresByType image/jpeg "access plus 7 days"
+    ExpiresByType image/png "access plus 7 days"
+    ExpiresByType image/webp "access plus 7 days"
+    ExpiresByType image/svg+xml "access plus 7 days"
 </IfModule>

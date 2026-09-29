@@ -211,6 +211,9 @@ export default function Contact() {
               className="space-y-6"
               noValidate
             >
+              <p className="text-sm leading-6 text-[var(--chi-grey)]">
+                We use the details you submit to respond to your enquiry. Please avoid sending sensitive information. Read our <a href="/privacy" className="font-semibold text-[var(--chi-leaf)] underline">Privacy Notice</a>.
+              </p>
               {/* Honeypot field (hidden) */}
               <input
                 type="text"

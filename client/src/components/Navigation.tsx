@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { useSiteImage } from "@/contexts/SiteImagesContext";
 
 const CHI_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663425159343/Uj3DVokpwmZufniMNHSrGB/chi-logo-final_2d6d3417.png";
 
@@ -8,8 +9,9 @@ const navLinks = [
   { label: "Home", href: "/" },
   { 
     label: "Our Work", 
-    href: "/milestones",
+    href: "/programs",
     dropdownItems: [
+      { label: "Programs & Activities", href: "/programs" },
       { label: "Kamariny (Water Source & Tree Planting)", href: "/milestones#kamariny-water-source-protection-2026" },
       { label: "Kipgorgotich (Water Point & Clean-up)", href: "/milestones#kipgorgotich-april-2026" },
       { label: "Kapshoo (Tree Planting & Cleaning)", href: "/milestones#kapshoo-tree-planting-2026" },
@@ -40,6 +42,7 @@ const navLinks = [
 
 
 export default function Navigation() {
+  const logo = useSiteImage("brand.logo", CHI_LOGO, "Clean Heights Initiative logo");
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [location] = useLocation();
@@ -134,8 +137,8 @@ export default function Navigation() {
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-3 group" aria-label="Clean Heights Initiative home">
             <img
-              src={CHI_LOGO}
-              alt="Clean Heights Initiative logo"
+              src={logo.src}
+              alt={logo.alt || "Clean Heights Initiative logo"}
               className="h-10 w-10 md:h-12 md:w-12 rounded-full object-contain bg-white p-0.5 shadow-sm chi-hover-lift flex-shrink-0"
             />
             <span className={`hidden sm:flex flex-col font-bold text-sm md:text-base leading-tight tracking-tight uppercase ${logoColor} transition-colors group-hover:text-[var(--chi-terracotta)]`}>
@@ -213,8 +216,8 @@ export default function Navigation() {
         <div className="flex items-center justify-between px-6 py-5 border-b border-[#E5DFD3]">
           <div className="flex items-center gap-2 font-bold text-[var(--chi-forest)] text-xs uppercase tracking-widest">
             <img
-              src={CHI_LOGO}
-              alt="CHI logo"
+              src={logo.src}
+              alt={logo.alt || "CHI logo"}
               className="h-10 w-10 rounded-full object-contain bg-white p-0.5 shadow-sm"
             />
             <span className="flex flex-col">

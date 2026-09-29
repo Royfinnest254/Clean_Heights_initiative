@@ -5,10 +5,12 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite --host",
+    "dev:api": "tsx watch server/index.ts",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "NODE_ENV=production node index.js",
+    "start": "node dist/index.js",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",
+    "cms:create-admin": "node scripts/create-admin.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -49,6 +51,8 @@
     "framer-motion": "^12.23.22",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.453.0",
+    "multer": "^2.4.0",
+    "mysql2": "^3.24.4",
     "nanoid": "^5.1.5",
     "next-themes": "^0.4.6",
     "react": "^19.2.1",

@@ -1,0 +1,83 @@
+-- Clean Heights Initiative CMS schema for MariaDB/MySQL 8+
+-- Import this once after creating the database in cPanel.
+SET NAMES utf8mb4;
+
+CREATE TABLE IF NOT EXISTS cms_admins (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(254) NOT NULL UNIQUE,
+  display_name VARCHAR(160) NOT NULL,
+  password_hash VARCHAR(180) NOT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS cms_sessions (
+  token_hash CHAR(64) NOT NULL PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL,
+  csrf_token CHAR(43) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX cms_sessions_expiry (expires_at),
+  CONSTRAINT cms_sessions_admin_fk FOREIGN KEY (user_id) REFERENCES cms_admins(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS cms_login_attempts (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  email_hash CHAR(64) NOT NULL,
+  ip_hash CHAR(64) NOT NULL,
+  succeeded TINYINT(1) NOT NULL DEFAULT 0,
+  attempted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX cms_login_rate (email_hash, ip_hash, succeeded, attempted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS cms_programs (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  slug VARCHAR(150) NOT NULL UNIQUE,
+  title VARCHAR(180) NOT NULL,
+  summary VARCHAR(500) NOT NULL DEFAULT '',
+  description MEDIUMTEXT NOT NULL,
+  status ENUM('draft','published') NOT NULL DEFAULT 'draft',
+  starts_on DATE NULL,
+  ends_on DATE NULL,
+  hero_image VARCHAR(500) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX cms_program_publication (status, starts_on)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS cms_activities (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  program_id BIGINT UNSIGNED NULL,
+  title VARCHAR(180) NOT NULL,
+  activity_date DATE NULL,
+  location VARCHAR(180) NOT NULL DEFAULT '',
+  summary VARCHAR(500) NOT NULL DEFAULT '',
+  description MEDIUMTEXT NOT NULL,
+  status ENUM('draft','published') NOT NULL DEFAULT 'draft',
+  image_path VARCHAR(500) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX cms_activity_program (program_id, status, activity_date),
+  INDEX cms_activity_publication (status, activity_date),
+  CONSTRAINT cms_activity_program_fk FOREIGN KEY (program_id) REFERENCES cms_programs(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS cms_media (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  original_name VARCHAR(240) NOT NULL,
+  path VARCHAR(500) NOT NULL UNIQUE,
+  alt_text VARCHAR(300) NOT NULL DEFAULT '',
+  width INT UNSIGNED NOT NULL,
+  height INT UNSIGNED NOT NULL,
+  bytes INT UNSIGNED NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS cms_image_slots (
+  slot_key VARCHAR(120) NOT NULL PRIMARY KEY,
+  media_id BIGINT UNSIGNED NULL,
+  alt_text VARCHAR(300) NOT NULL DEFAULT '',
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT cms_image_slot_media_fk FOREIGN KEY (media_id) REFERENCES cms_media(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

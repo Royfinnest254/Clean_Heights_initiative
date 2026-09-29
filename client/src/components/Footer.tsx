@@ -1,17 +1,19 @@
 import { Link } from "wouter";
-import { Mail, Phone, Instagram, Linkedin, MapPin, Leaf, Heart, ShieldCheck } from "lucide-react";
+import { useSiteImage } from "@/contexts/SiteImagesContext";
+import { Mail, Phone, Instagram, Linkedin, MapPin, Heart } from "lucide-react";
 
 
 const CHI_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663425159343/Uj3DVokpwmZufniMNHSrGB/chi-logo-final_2d6d3417.png";
 
 const quickLinks = [
   { label: "Home", href: "/" },
-  { label: "Our Work", href: "/milestones" },
+  { label: "Our Work", href: "/programs" },
   { label: "About", href: "/about" },
   { label: "Get Involved", href: "/contact" },
 ];
 
 export default function Footer() {
+  const logo = useSiteImage("brand.logo", CHI_LOGO, "Clean Heights Initiative logo");
   return (
     <footer className="bg-[var(--chi-charcoal)] text-white pt-20 pb-10 border-t-4 border-[var(--chi-leaf)] relative overflow-hidden">
       
@@ -25,8 +27,8 @@ export default function Footer() {
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-6">
               <img
-                src={CHI_LOGO}
-                alt="Clean Heights Initiative logo"
+                src={logo.src}
+                alt={logo.alt || "Clean Heights Initiative logo"}
                 className="h-12 w-12 rounded-full object-contain bg-white p-0.5"
               />
               <span className="font-extrabold text-sm uppercase tracking-widest leading-tight">
@@ -148,6 +150,13 @@ export default function Footer() {
             <span>Powered by Community</span>
             <Heart size={10} className="text-[var(--chi-terracotta)]" />
           </div>
+          <nav aria-label="Legal" className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-gray-400">
+            <Link href="/privacy" className="hover:text-white">Privacy</Link>
+            <Link href="/cookies" className="hover:text-white">Cookies</Link>
+            <Link href="/terms" className="hover:text-white">Terms</Link>
+            <Link href="/accessibility" className="hover:text-white">Accessibility</Link>
+            <button type="button" onClick={() => window.dispatchEvent(new Event("chi:cookie-settings"))} className="hover:text-white">Cookie settings</button>
+          </nav>
         </div>
       </div>
     </footer>
