@@ -8,10 +8,11 @@ const CHI_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663425159343/Uj3DV
 const navLinks = [
   { label: "Home", href: "/" },
   { 
-    label: "Our Work", 
+    label: "Our Initiatives", 
     href: "/programs",
     dropdownItems: [
-      { label: "Programs & Activities", href: "/programs" },
+      { label: "Programs and Activities", href: "/programs" },
+      { label: "Field Activities and Milestones", href: "/milestones" },
       { label: "Kamariny (Water Source & Tree Planting)", href: "/milestones#kamariny-water-source-protection-2026" },
       { label: "Kipgorgotich (Water Point & Clean-up)", href: "/milestones#kipgorgotich-april-2026" },
       { label: "Kapshoo (Tree Planting & Cleaning)", href: "/milestones#kapshoo-tree-planting-2026" },

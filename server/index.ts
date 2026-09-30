@@ -9,6 +9,7 @@ import fs from "node:fs/promises";
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getPageSeo, seoPages } from "../shared/seo.js";
 
 const scrypt = promisify(scryptCallback);
 const app = express();
@@ -418,9 +419,58 @@ if (staticPath !== sourceStaticPath) {
     else if (/\.html?$/i.test(filePath)) res.setHeader("Cache-Control", "no-cache, must-revalidate");
   } }));
 }
-app.get("*", (_req, res) => {
+app.get("/projects", (_req, res) => res.redirect(301, "/programs"));
+
+app.get("*", (req, res) => {
   res.setHeader("Cache-Control", "no-cache, must-revalidate");
-  res.sendFile(path.join(staticPath, "index.html"));
+  const escapeHtml = (value: string) => value.replace(/[&<>\"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" } as Record<string, string>)[char]);
+  const pathname = req.path.replace(/\/$/, "") || "/";
+  const page = getPageSeo(pathname);
+  const canonical = `https://cleanheightsinitiative.org${pathname}`;
+  const image = `https://cleanheightsinitiative.org${page.image || "/hero-bg.jpg"}`;
+  let html = readFileSync(path.join(staticPath, "index.html"), "utf8");
+  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(page.title)}</title>`);
+  html = html.replace(/<meta name="description" content="[^"]*"\s*\/?\s*>/i, `<meta name="description" content="${escapeHtml(page.description)}" />`);
+  html = html.replace(/<meta property="og:title" content="[^"]*"\s*\/?\s*>/i, `<meta property="og:title" content="${escapeHtml(page.title)}" />`);
+  html = html.replace(/<meta property="og:description" content="[^"]*"\s*\/?\s*>/i, `<meta property="og:description" content="${escapeHtml(page.description)}" />`);
+  html = html.replace(/<meta property="og:url" content="[^"]*"\s*\/?\s*>/i, `<meta property="og:url" content="${escapeHtml(canonical)}" />`);
+  html = html.replace(/<meta property="og:image" content="[^"]*"\s*\/?\s*>/i, `<meta property="og:image" content="${escapeHtml(image)}" />`);
+  html = html.replace(/<meta name="twitter:title" content="[^"]*"\s*\/?\s*>/i, `<meta name="twitter:title" content="${escapeHtml(page.title)}" />`);
+  html = html.replace(/<meta name="twitter:description" content="[^"]*"\s*\/?\s*>/i, `<meta name="twitter:description" content="${escapeHtml(page.description)}" />`);
+  html = html.replace(/<meta name="twitter:image" content="[^"]*"\s*\/?\s*>/i, `<meta name="twitter:image" content="${escapeHtml(image)}" />`);
+  html = html.replace(/<link rel="canonical" href="[^"]*"\s*\/?\s*>/i, `<link rel="canonical" href="${escapeHtml(canonical)}" />`);
+  const robots = page.noIndex ? "noindex, nofollow" : "index, follow";
+  if (/<meta name="robots" content="[^"]*"\s*\/?\s*>/i.test(html)) {
+    html = html.replace(/<meta name="robots" content="[^"]*"\s*\/?\s*>/i, `<meta name="robots" content="${robots}" />`);
+  } else {
+    html = html.replace("</head>", `  <meta name="robots" content="${robots}" />\n  </head>`);
+  }
+  if (req.path === "/team") {
+    const people = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://cleanheightsinitiative.org/team#cynthia-jelagat",
+          name: "Cynthia Jelagat",
+          jobTitle: "Founder and Chairperson",
+          image: "https://cleanheightsinitiative.org/founder-portrait.jpg",
+          worksFor: { "@id": "https://cleanheightsinitiative.org/#organization" },
+          url: "https://cleanheightsinitiative.org/team",
+        },
+        {
+          "@type": "Person",
+          "@id": "https://cleanheightsinitiative.org/team#roy-chumba",
+          name: "Roy Chumba",
+          jobTitle: "Chief Information Officer",
+          worksFor: { "@id": "https://cleanheightsinitiative.org/#organization" },
+          url: "https://cleanheightsinitiative.org/team",
+        },
+      ],
+    };
+    html = html.replace("</head>", `  <script type="application/ld+json">${JSON.stringify(people)}</script>\n  </head>`);
+  }
+  res.status(Object.prototype.hasOwnProperty.call(seoPages, pathname) ? 200 : 404).type("html").send(html);
 });
 
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {

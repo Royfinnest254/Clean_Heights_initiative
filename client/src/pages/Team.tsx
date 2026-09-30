@@ -18,6 +18,7 @@ interface TeamMember {
 
 function MemberPhoto({ member, className }: { member: TeamMember; className: string }) {
   const image = useSiteImage(`team.${member.id}.photo`, member.photo, member.name);
+  if (!image.src) return <div aria-label={`${member.name} photo not yet added`} className={`${className} flex items-center justify-center bg-[#EAF1E8] text-[#315D3A]`}><User size={56} aria-hidden="true" /></div>;
   return <img src={image.src} alt={image.alt || member.name} className={className} loading="lazy" decoding="async" />;
 }
 
@@ -98,7 +99,7 @@ export default function Team() {
       <section className="py-24 relative overflow-hidden">
         <div className="container mx-auto px-4">
           {leadership.map((member) => (
-            <div key={member.id} className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center chi-reveal">
+            <div key={member.id} id={member.id} className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center chi-reveal">
               <div className="lg:col-span-5">
                 <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl group border-4 border-white mb-8 lg:mb-0">
                   <MemberPhoto member={member} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />

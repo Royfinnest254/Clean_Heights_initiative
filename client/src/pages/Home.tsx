@@ -222,7 +222,7 @@ export default function Home() {
             }}
           />
           {/* Subtle multi-stage black gradient to allow clean visual breathing room for text and branding */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/35 z-[1]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/20 to-black/15 z-[1]" />
         </div>
 
         {/* Hero content area - perfectly centered and beautifully weighted */}
@@ -264,22 +264,10 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-4">
             <div>
-              <span className="text-[var(--chi-terracotta)] text-xs font-black uppercase tracking-[0.25em] mb-2 block">
-                Direct from the Escarpment
-              </span>
               <h2 id="news-heading" className="text-[var(--chi-forest)] font-serif font-bold text-3xl sm:text-4xl">
-                Field Dispatches & News
+                Latest News
               </h2>
             </div>
-            <a
-              href="https://blog.cleanheightsinitiative.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-bold uppercase tracking-widest text-[var(--chi-grey)] hover:text-[var(--chi-terracotta)] transition-colors flex items-center gap-2"
-            >
-              Enter Storyteller Portal
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-external-link"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-            </a>
           </div>
 
           {newsLoading ? (
@@ -304,8 +292,11 @@ export default function Home() {
                 {(() => {
                   const featured = news[0];
                   return (
-                    <article
-                      onClick={() => window.open(`https://blog.cleanheightsinitiative.org/?post=${featured.id}`, '_blank')}
+                    <a
+                      href={`https://blog.cleanheightsinitiative.org/?post=${featured.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Read story: ${featured.title}`}
                       className="group cursor-pointer relative h-[450px] rounded-3xl overflow-hidden border border-[#E5DFD3]/80 shadow-md flex flex-col justify-end bg-[var(--chi-forest)]"
                     >
                       <img
@@ -334,7 +325,7 @@ export default function Home() {
                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                         </span>
                       </div>
-                    </article>
+                    </a>
                   );
                 })()}
               </div>
@@ -343,9 +334,11 @@ export default function Home() {
               <div className="lg:col-span-5 flex flex-col justify-between gap-8 py-2">
                 <div className="space-y-8 divide-y divide-[#E5DFD3]/60">
                   {news.slice(1, 3).map((post, idx) => (
-                    <article
+                    <a
                       key={post.id}
-                      onClick={() => window.open(`https://blog.cleanheightsinitiative.org/?post=${post.id}`, '_blank')}
+                      href={`https://blog.cleanheightsinitiative.org/?post=${post.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={`group cursor-pointer flex gap-5 items-start transition-all ${idx > 0 ? "pt-8" : ""}`}
                     >
                       <div className="w-24 h-24 rounded-2xl overflow-hidden bg-[var(--chi-forest)] flex-shrink-0 border border-[#E5DFD3]/40">
@@ -376,7 +369,7 @@ export default function Home() {
                           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                         </span>
                       </div>
-                    </article>
+                    </a>
                   ))}
                 </div>
 

@@ -17,6 +17,7 @@ import { SiteImagesProvider } from "./contexts/SiteImagesContext";
 import Team from "./pages/Team";
 import EcoTourism from "./pages/EcoTourism";
 import AdminSetupPage from "./pages/AdminSetupPage";
+import SeoHead from "./components/SeoHead";
 
 function Router() {
   return (
@@ -48,6 +49,7 @@ function App() {
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
+          <SeoHead />
           <CookieNotice />
           <SiteImagesProvider><Router /></SiteImagesProvider>
         </TooltipProvider>

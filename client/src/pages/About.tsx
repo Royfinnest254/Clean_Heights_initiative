@@ -99,6 +99,27 @@ export default function About() {
         </div>
       </section>
 
+      {/* ── Our Pillars ── */}
+      <section id="pillars" className="py-20 bg-white border-y border-[#E5DFD3] scroll-mt-28">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="mx-auto mb-12 max-w-3xl text-center">
+            <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-[var(--chi-terracotta)]">How we focus our work</p>
+            <h2 className="mt-3 text-[var(--chi-forest)]">Our Pillars</h2>
+            <p className="mt-4 text-lg leading-7 text-[var(--chi-grey)]">We connect care for the environment with the strength and ideas of the communities who live here.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <article className="rounded-2xl border border-[#E5DFD3] bg-[var(--chi-warm-white)] p-7 sm:p-9">
+              <h3 className="text-2xl font-bold text-[var(--chi-forest)]">Environmental Conservation</h3>
+              <p className="mt-4 leading-7 text-[var(--chi-grey)]">Community-led care for local ecosystems, landscapes, biodiversity, and water sources through practical restoration and ongoing stewardship.</p>
+            </article>
+            <article className="rounded-2xl border border-[#E5DFD3] bg-[var(--chi-warm-white)] p-7 sm:p-9">
+              <h3 className="text-2xl font-bold text-[var(--chi-forest)]">Community Development</h3>
+              <p className="mt-4 leading-7 text-[var(--chi-grey)]">Supporting local leadership, youth and women’s participation, learning, civic action, innovation, and community-led livelihoods.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       {/* ── Core Values (Card grid) ── */}
       <section id="values" className="py-20 bg-[var(--chi-forest)] text-white relative overflow-hidden scroll-mt-28">
         <TopographicBg color="#ffffff" opacity={0.04} />
