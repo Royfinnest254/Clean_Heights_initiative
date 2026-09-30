@@ -1,5 +1,7 @@
 # Beginner setup: Clean Heights on Namecheap cPanel
 
+If the database and Node.js application have already been created and you are updating from a ZIP, use [`FILE-MANAGER-AND-CMS-GUIDE.md`](FILE-MANAGER-AND-CMS-GUIDE.md) first. It shows the cPanel File Manager upload/extract steps and explains how to publish a program with activities. The Git Version Control instructions below are for the Git-based setup path.
+
 This guide uses the cPanel buttons and browser screens. It does not require Terminal. Take one stage at a time. Back up the site before changing its app routing. The Node app serves the built pages and original public images directly; deployment does not copy the large image archive into `public_html`.
 
 ## What happens once

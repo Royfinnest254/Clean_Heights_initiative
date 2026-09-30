@@ -21,8 +21,16 @@ Package prepared 30 September 2026 from the current Clean Heights Initiative rep
 - Published programs do not yet have individual, stable page URLs. The public CMS currently lists programs and activities together on `/programs`.
 - The favicon file itself has not been redrawn from the official logo. The HTML references it with a new cache version, but this alone does not change the icon artwork.
 - The cookie notice explains currently used browser storage; it is not a reject/accept preference manager for analytics or advertising. Those trackers are not in the current app code.
+- The administrator login email is not the same as the public contact email. The public contact email, news copy/photos, and all milestone-gallery photos are not editable through the current CMS; they remain code-managed.
 - The legal pages are drafts and have not been reviewed by a Kenyan lawyer or checked against every provider and data-handling practice.
 - Search performance, Google indexing, Bing indexing, rankings, and the live Namecheap deployment have not been verified from the organization's Search Console or hosting account. The latest deployment evidence showed a LiteSpeed 503.
+
+## 1 October 2026 — lower-friction activity publishing
+
+- Added **+ Add activity** on each CMS program card. It opens the activity form with the parent program preselected.
+- Published activity cards now expose their full descriptions through a keyboard-accessible **Read activity details** disclosure, including activities nested inside programs.
+- Made the cookie notice state its use of browser storage clearly and labeled the action **Close notice**. The footer **Cookie settings** link reopens it after it has been closed.
+- Added `FILE-MANAGER-AND-CMS-GUIDE.md` with browser-only cPanel upload directions, first administrator setup, and beginner steps for programs, nested activities, standalone activities, and images.
 
 ## Photo-quality choice
 

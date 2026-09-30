@@ -85,6 +85,13 @@ export default function AdminPage() {
     setActivityForm({ title: activity.title, programId: activity.program_id ? String(activity.program_id) : "", activityDate: activity.activity_date || "", location: activity.location, summary: activity.summary, description: activity.description, status: activity.status, imagePath: activity.image_path || "" });
   };
 
+  const addActivityToProgram = (program: Program) => {
+    setActivityId(null);
+    setActivityForm({ ...emptyActivity, programId: String(program.id) });
+    setTab("activities");
+    setNotice(`New activity will be added to “${program.title}”.`);
+  };
+
   const saveProgram = async (event: FormEvent) => {
     event.preventDefault(); setBusy(true); setNotice("");
     try {
@@ -163,7 +170,7 @@ export default function AdminPage() {
           {notice && <p role="status" className="mb-5 rounded-lg bg-[#EAF1E8] p-3 text-sm text-[#315D3A]">{notice}</p>}
           {tab === "programs" && <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,0.9fr)]">
             <div><div className="flex items-center justify-between gap-3"><div><h2 className="text-xl font-bold">Programs</h2><p className="mt-1 text-sm text-[#68746A]">Each program can contain multiple activities.</p></div><button onClick={() => { setProgramId(null); setProgramForm(emptyProgram); }} className="rounded-lg bg-[#1B4332] px-3 py-2 text-sm font-semibold text-white">New program</button></div>
-              <div className="mt-5 space-y-3">{programs.map((item) => <div key={item.id} className="rounded-xl border border-[#E5DFD3] p-4"><div className="flex justify-between gap-3"><div><h3 className="font-bold">{item.title}</h3><p className="mt-1 text-xs uppercase tracking-wide text-[#68746A]">{item.status} · {activities.filter((a) => a.program_id === item.id).length} activities</p></div><div className="flex gap-2"><button onClick={() => chooseProgram(item)} className="text-sm font-semibold text-[#315D3A] underline">Edit</button><button onClick={() => deleteItem("programs",item.id)} className="text-sm font-semibold text-red-700 underline">Delete</button></div></div><p className="mt-3 text-sm leading-6 text-[#68746A]">{item.summary}</p></div>)}</div>
+              <div className="mt-5 space-y-3">{programs.map((item) => <div key={item.id} className="rounded-xl border border-[#E5DFD3] p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-bold">{item.title}</h3><p className="mt-1 text-xs uppercase tracking-wide text-[#68746A]">{item.status} · {activities.filter((a) => a.program_id === item.id).length} activities</p></div><div className="flex flex-wrap gap-3"><button onClick={() => addActivityToProgram(item)} className="text-sm font-semibold text-[#315D3A] underline">+ Add activity</button><button onClick={() => chooseProgram(item)} className="text-sm font-semibold text-[#315D3A] underline">Edit program</button><button onClick={() => deleteItem("programs",item.id)} className="text-sm font-semibold text-red-700 underline">Delete</button></div></div><p className="mt-3 text-sm leading-6 text-[#68746A]">{item.summary}</p></div>)}</div>
             </div>
             <form onSubmit={saveProgram} className="rounded-xl bg-[#F7F5F0] p-4 sm:p-5"><h3 className="font-bold">{programId ? "Edit program" : "New program"}</h3><div className="mt-4 space-y-3">
               <label className="block text-sm font-semibold">Title<input required maxLength={180} className={`${fieldClass} mt-1`} value={programForm.title} onChange={(e)=>setProgramForm({...programForm,title:e.target.value})}/></label>
