@@ -25,7 +25,7 @@ Package prepared 30 September 2026 from the current Clean Heights Initiative rep
 - The legal pages are drafts and have not been reviewed by a Kenyan lawyer or checked against every provider and data-handling practice.
 - Search performance, Google indexing, Bing indexing, rankings, and the live Namecheap deployment have not been verified from the organization's Search Console or hosting account. The latest deployment evidence showed a LiteSpeed 503.
 
-## 1 October 2026 — lower-friction activity publishing
+## 30 September 2026 — lower-friction activity publishing
 
 - Added **+ Add activity** on each CMS program card. It opens the activity form with the parent program preselected.
 - Published activity cards now expose their full descriptions through a keyboard-accessible **Read activity details** disclosure, including activities nested inside programs.
