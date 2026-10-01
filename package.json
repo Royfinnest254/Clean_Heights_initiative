@@ -7,6 +7,8 @@
     "dev": "vite --host",
     "dev:api": "tsx watch server/index.ts",
     "build": "node scripts/generate-sitemap.mjs && vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build:namecheap-php": "npm run build && node scripts/package-namecheap-php.mjs",
+    "cms:snapshot-news": "node scripts/snapshot-legacy-news.mjs",
     "start": "node dist/index.js",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",

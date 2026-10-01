@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import { ArrowRight, ImageIcon } from "lucide-react";
+import { ManagedImage } from "@/contexts/SiteImagesContext";
 
 /* ── Local Scroll reveal ── */
 function useScrollRevealGallery(dependencies: any[]) {
@@ -95,7 +96,7 @@ function GalleryImage({ photo, delay }: { photo: any, delay: number }) {
     <div
       className={`break-inside-avoid relative group overflow-hidden rounded-xl bg-[var(--chi-warm-white)] border border-[#E5DFD3] shadow-sm hover:shadow-xl transition-shadow chi-reveal chi-delay-${delay + 1}`}
     >
-      <img
+      <ManagedImage
         src={photo.src}
         alt={photo.alt}
         onLoad={() => setLoaded(true)}

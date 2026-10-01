@@ -39,6 +39,7 @@ function useScrollReveal() {
 }
 
 export default function Contact() {
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
@@ -347,15 +348,15 @@ export default function Contact() {
 
       {/* ── Map Section ── */}
       <section id="map" className="h-[400px] w-full relative border-t border-[#E5DFD3] scroll-mt-28">
-        <iframe 
+        {!mapLoaded ? <div className="flex h-full flex-col items-center justify-center gap-4 bg-[#EAF1E8] px-5 text-center"><MapPin className="text-[#1B4332]" size={32}/><p className="font-semibold text-[#1B4332]">Iten, Elgeyo Marakwet, Kenya</p><button type="button" onClick={()=>setMapLoaded(true)} className="rounded-lg bg-[#1B4332] px-4 py-2.5 text-sm font-bold text-white">Load Google Map</button><a className="text-sm font-semibold text-[#315D3A] underline" href="https://maps.google.com/?q=Iten%2C+Kenya" target="_blank" rel="noreferrer">Open location in Google Maps</a></div> : <iframe
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63832.61051515286!2d35.47413695277717!3d0.67566196232591!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1781b0a701b22e1b%3A0x67feec3b3bbdf340!2sIten%2C%20Kenya!5e0!3m2!1sen!2sus!4v1711718816913!5m2!1sen!2sus"
-          width="100%" 
-          height="100%" 
-          loading="lazy" 
-          referrerPolicy="no-referrer-when-downgrade" 
+          width="100%"
+          height="100%"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
           className="border-0 grayscale contrast-125 opacity-90 hover:grayscale-0 transition-all duration-700"
           title="Clean Heights Initiative Location in Iten, Elgeyo Marakwet"
-        />
+        />}
       </section>
 
       <Footer />

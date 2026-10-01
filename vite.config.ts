@@ -149,10 +149,10 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
-
-export default defineConfig({
-  plugins,
+export default defineConfig(({ command }) => ({
+  // The Manus preview/debug runtime is useful during local development, but
+  // must not be embedded in the public production HTML.
+  plugins: [react(), tailwindcss(), ...(command === "serve" ? [vitePluginManusRuntime(), vitePluginManusDebugCollector()] : [])],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
@@ -191,4 +191,4 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
-});
+}));

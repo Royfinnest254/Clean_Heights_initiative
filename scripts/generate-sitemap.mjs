@@ -24,6 +24,11 @@ addPage("/team", ["/founder-portrait.jpg"]);
 addPage("/milestones");
 addPage("/programs");
 addPage("/contact");
+addPage("/news");
+addPage("/privacy");
+addPage("/cookies");
+addPage("/terms");
+addPage("/accessibility");
 addPage("/ecotourism", ["/milestones/escarpment/eco-planting.jpg"]);
 
 const milestonesPath = path.join(publicDir, "data", "milestones.json");

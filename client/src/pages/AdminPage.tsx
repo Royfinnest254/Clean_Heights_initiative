@@ -1,16 +1,19 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link } from "wouter";
-import { LogOut, ImagePlus, FolderKanban, CalendarDays, ShieldCheck } from "lucide-react";
+import { LogOut, ImagePlus, FolderKanban, CalendarDays, ShieldCheck, Newspaper, Images } from "lucide-react";
 
 type Program = { id: number; slug: string; title: string; summary: string; description: string; status: "draft" | "published"; starts_on: string | null; ends_on: string | null; hero_image: string | null };
 type Activity = { id: number; program_id: number | null; title: string; activity_date: string | null; location: string; summary: string; description: string; status: "draft" | "published"; image_path: string | null };
 type Media = { id: number; original_name: string; path: string; alt_text: string; width: number; height: number; bytes: number };
 type Slot = { slot_key: string; media_id: number | null; alt_text: string };
+type SiteAsset = { path: string; name: string; media_id: number | null; media_path: string | null; alt_text: string };
+type News = { id: number; slug: string; title: string; excerpt: string; content: string; author: string; display_date: string; category: string; image_path: string | null; status: "draft" | "published"; gallery: string[] };
 
 const fieldClass = "w-full rounded-lg border border-[#D8D2C7] bg-white px-3 py-2.5 text-sm text-[#26342C] outline-none focus:border-[#477A51] focus:ring-2 focus:ring-[#477A51]/20";
 const knownImageSlots = ["brand.logo", "home.hero", "home.community", "home.partner.shoe4africa", "home.partner.nema", "home.partner.elgeyo-marakwet", "home.partner.swiss-side", "about.founder", "team.cynthia-founder.photo"];
 const emptyProgram = { title: "", slug: "", summary: "", description: "", status: "draft", startsOn: "", endsOn: "", heroImage: "" };
 const emptyActivity = { title: "", programId: "", activityDate: "", location: "", summary: "", description: "", status: "draft", imagePath: "" };
+const emptyNews = { title: "", slug: "", excerpt: "", content: "", author: "", date: "", category: "", image: "", status: "draft", gallery: [] as string[] };
 
 async function responseJson(response: Response) {
   const data = await response.json().catch(() => ({}));
@@ -18,15 +21,42 @@ async function responseJson(response: Response) {
   return data;
 }
 
+async function optimizeImageForUpload(file: File): Promise<File> {
+  if (!file.type.startsWith("image/") || typeof createImageBitmap !== "function") return file;
+  let bitmap: ImageBitmap | null = null;
+  try {
+    bitmap = await createImageBitmap(file, { resizeWidth: 2400, resizeQuality: "high" });
+    const scale = Math.min(1, 1800 / bitmap.height);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return file;
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.82));
+    return blob ? new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.webp`, { type: "image/webp", lastModified: Date.now() }) : file;
+  } catch {
+    return file;
+  } finally {
+    bitmap?.close();
+  }
+}
+
 export default function AdminPage() {
   const [user, setUser] = useState<{ email: string; displayName: string } | null>(null);
   const [csrf, setCsrf] = useState("");
   const [pageReady, setPageReady] = useState(false);
-  const [tab, setTab] = useState<"programs" | "activities" | "media">("programs");
+  const [tab, setTab] = useState<"programs" | "activities" | "news" | "media">("programs");
   const [programs, setPrograms] = useState<Program[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [media, setMedia] = useState<Media[]>([]);
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [siteAssets, setSiteAssets] = useState<SiteAsset[]>([]);
+  const [news, setNews] = useState<News[]>([]);
+  const [newsId, setNewsId] = useState<number | null>(null);
+  const [newsForm, setNewsForm] = useState(emptyNews);
+  const [assetChoice, setAssetChoice] = useState("");
+  const [assetMedia, setAssetMedia] = useState("");
   const [programId, setProgramId] = useState<number | null>(null);
   const [activityId, setActivityId] = useState<number | null>(null);
   const [programForm, setProgramForm] = useState(emptyProgram);
@@ -46,13 +76,15 @@ export default function AdminPage() {
   }));
 
   const loadContent = async () => {
-    const [content, mediaData, slotData] = await Promise.all([
-      api("/api/admin/programs"), api("/api/admin/media"), api("/api/admin/image-slots"),
+    const [content, mediaData, slotData, assetData, newsData] = await Promise.all([
+      api("/api/admin/programs"), api("/api/admin/media"), api("/api/admin/image-slots"), api("/api/admin/site-assets"), api("/api/admin/news"),
     ]);
     setPrograms(content.programs);
     setActivities(content.activities);
     setMedia(mediaData.media);
     setSlots(slotData.slots);
+    setSiteAssets(assetData.assets || []);
+    setNews(newsData.posts || []);
   };
 
   useEffect(() => {
@@ -123,9 +155,10 @@ export default function AdminPage() {
     if (!uploadFile) return setNotice("Choose an image first.");
     setBusy(true); setNotice("");
     try {
-      const form = new FormData(); form.append("image", uploadFile); form.append("altText", uploadAlt);
+      const optimizedFile = await optimizeImageForUpload(uploadFile);
+      const form = new FormData(); form.append("image", optimizedFile); form.append("altText", uploadAlt);
       await api("/api/admin/media", { method: "POST", body: form });
-      setUploadFile(null); setUploadAlt(""); await loadContent(); setNotice("Image uploaded and optimized as WebP.");
+      setUploadFile(null); setUploadAlt(""); await loadContent(); setNotice(`Image uploaded (${(optimizedFile.size / 1024).toFixed(0)} KB) and optimized as WebP.`);
     } catch (error) { setNotice(error instanceof Error ? error.message : "Image upload failed."); }
     finally { setBusy(false); }
   };
@@ -136,6 +169,32 @@ export default function AdminPage() {
       await api(`/api/admin/image-slots/${encodeURIComponent(slotKey)}`, { method: "PUT", body: JSON.stringify({ mediaId: slotMedia ? Number(slotMedia) : null, altText: media.find((item) => item.id === Number(slotMedia))?.alt_text || "" }) });
       setSlotKey(""); setSlotMedia(""); await loadContent(); setNotice("Image slot saved. The public template must use this slot key for the override to appear.");
     } catch (error) { setNotice(error instanceof Error ? error.message : "Could not save image slot."); }
+  };
+
+  const chooseNews = (item: News) => {
+    setNewsId(item.id);
+    setNewsForm({ title:item.title,slug:item.slug,excerpt:item.excerpt,content:item.content,author:item.author,date:item.display_date,category:item.category,image:item.image_path || "",status:item.status,gallery:item.gallery || [] });
+  };
+  const saveNews = async (event: FormEvent) => {
+    event.preventDefault(); setBusy(true); setNotice("");
+    try {
+      await api(newsId ? `/api/admin/news/${newsId}` : "/api/admin/news", { method:newsId ? "PUT" : "POST", body:JSON.stringify(newsForm) });
+      setNewsId(null); setNewsForm(emptyNews); await loadContent(); setNotice("News story saved.");
+    } catch (error) { setNotice(error instanceof Error ? error.message : "Could not save story."); }
+    finally { setBusy(false); }
+  };
+  const deleteNews = async (id: number) => {
+    if (!window.confirm("Delete this news story?")) return;
+    try { await api(`/api/admin/news/${id}`, { method:"DELETE" }); await loadContent(); setNotice("Story deleted."); }
+    catch (error) { setNotice(error instanceof Error ? error.message : "Could not delete story."); }
+  };
+  const saveAsset = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!assetChoice) return setNotice("Choose a site photo first.");
+    try {
+      await api("/api/admin/site-assets", { method:"PUT", body:JSON.stringify({ sourcePath:assetChoice, mediaId:assetMedia ? Number(assetMedia) : null, altText:media.find((item)=>item.id===Number(assetMedia))?.alt_text || "" }) });
+      setAssetChoice(""); setAssetMedia(""); await loadContent(); setNotice("Site photo updated.");
+    } catch (error) { setNotice(error instanceof Error ? error.message : "Could not update site photo."); }
   };
 
   if (!pageReady) return <div className="min-h-screen bg-[#F7F5F0] p-8">Loading secure portal…</div>;
@@ -150,7 +209,7 @@ export default function AdminPage() {
         <label className="mt-6 block text-sm font-semibold">Email<input className={`${fieldClass} mt-2`} type="email" autoComplete="username" required value={login.email} onChange={(e) => setLogin({ ...login, email: e.target.value })} /></label>
         <label className="mt-4 block text-sm font-semibold">Password<input className={`${fieldClass} mt-2`} type="password" autoComplete="current-password" required value={login.password} onChange={(e) => setLogin({ ...login, password: e.target.value })} /></label>
         <button disabled={busy} className="mt-6 w-full rounded-lg bg-[#1B4332] px-4 py-3 font-bold text-white disabled:opacity-50">{busy ? "Signing in…" : "Sign in"}</button>
-        <p className="mt-4 text-xs leading-5 text-[#68746A]">First time here? <Link href="/admin/setup" className="font-semibold text-[#315D3A] underline">Set up the first administrator</Link>. Setup closes automatically after the first account is created.</p>
+        <p className="mt-4 text-xs leading-5 text-[#68746A]">First time here? <Link href="/admin/setup" className="font-semibold text-[#315D3A] underline">Set up the administrator</Link>. After saving, remove the temporary setup key from the private configuration file.</p>
       </form>
     </main>
   );
@@ -165,7 +224,7 @@ export default function AdminPage() {
         </div>
       </header>
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[220px_1fr]">
-        <aside className="flex flex-wrap content-start gap-2 lg:flex-col">{tabButton("programs","Programs",FolderKanban)}{tabButton("activities","Activities",CalendarDays)}{tabButton("media","Images & slots",ImagePlus)}<p className="mt-3 text-xs leading-5 text-[#68746A]">Published items appear publicly. Drafts stay in the portal.</p></aside>
+        <aside className="flex flex-wrap content-start gap-2 lg:flex-col">{tabButton("programs","Programs",FolderKanban)}{tabButton("activities","Activities",CalendarDays)}{tabButton("news","News",Newspaper)}{tabButton("media","Images & site photos",ImagePlus)}<p className="mt-3 text-xs leading-5 text-[#68746A]">Published items appear publicly. Drafts stay in the portal.</p></aside>
         <section className="min-w-0 rounded-2xl border border-[#E5DFD3] bg-white p-4 shadow-sm sm:p-6">
           {notice && <p role="status" className="mb-5 rounded-lg bg-[#EAF1E8] p-3 text-sm text-[#315D3A]">{notice}</p>}
           {tab === "programs" && <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,0.9fr)]">
@@ -198,9 +257,13 @@ export default function AdminPage() {
               <div className="flex gap-2"><button disabled={busy} className="rounded-lg bg-[#1B4332] px-4 py-2.5 text-sm font-bold text-white">Save activity</button><button type="button" onClick={()=>{setActivityId(null);setActivityForm(emptyActivity)}} className="rounded-lg border border-[#D8D2C7] px-4 py-2.5 text-sm font-semibold">Clear</button></div>
             </div></form>
           </div>}
+          {tab === "news" && <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,0.9fr)]"><div><div className="flex items-center justify-between gap-3"><div><h2 className="text-xl font-bold">News stories</h2><p className="mt-1 text-sm text-[#68746A]">Stories appear on the homepage and their own readable page.</p></div><button onClick={()=>{setNewsId(null);setNewsForm(emptyNews)}} className="rounded-lg bg-[#1B4332] px-3 py-2 text-sm font-semibold text-white">New story</button></div><div className="mt-5 space-y-3">{news.map((item)=><article key={item.id} className="rounded-xl border border-[#E5DFD3] p-4"><div className="flex justify-between gap-3"><div><h3 className="font-bold">{item.title}</h3><p className="mt-1 text-xs uppercase text-[#68746A]">{item.status} · {item.display_date || "No date"}</p></div><div className="flex gap-3"><button onClick={()=>chooseNews(item)} className="text-sm font-semibold text-[#315D3A] underline">Edit</button><button onClick={()=>deleteNews(item.id)} className="text-sm font-semibold text-red-700 underline">Delete</button></div></div><p className="mt-2 text-sm text-[#68746A]">{item.excerpt}</p></article>)}</div></div>
+            <form onSubmit={saveNews} className="rounded-xl bg-[#F7F5F0] p-4 sm:p-5"><h3 className="font-bold">{newsId ? "Edit story" : "New story"}</h3><div className="mt-4 space-y-3"><label className="block text-sm font-semibold">Title<input required className={`${fieldClass} mt-1`} value={newsForm.title} onChange={(e)=>setNewsForm({...newsForm,title:e.target.value})}/></label><label className="block text-sm font-semibold">URL slug<input className={`${fieldClass} mt-1`} placeholder="created-from-title" value={newsForm.slug} onChange={(e)=>setNewsForm({...newsForm,slug:e.target.value})}/></label><label className="block text-sm font-semibold">Short introduction<textarea className={`${fieldClass} mt-1 min-h-20`} value={newsForm.excerpt} onChange={(e)=>setNewsForm({...newsForm,excerpt:e.target.value})}/></label><label className="block text-sm font-semibold">Story<textarea className={`${fieldClass} mt-1 min-h-48`} value={newsForm.content} onChange={(e)=>setNewsForm({...newsForm,content:e.target.value})}/></label><div className="grid grid-cols-2 gap-3"><label className="text-sm font-semibold">Author<input className={`${fieldClass} mt-1`} value={newsForm.author} onChange={(e)=>setNewsForm({...newsForm,author:e.target.value})}/></label><label className="text-sm font-semibold">Date<input className={`${fieldClass} mt-1`} placeholder="1 October 2026" value={newsForm.date} onChange={(e)=>setNewsForm({...newsForm,date:e.target.value})}/></label></div><label className="block text-sm font-semibold">Category<input className={`${fieldClass} mt-1`} value={newsForm.category} onChange={(e)=>setNewsForm({...newsForm,category:e.target.value})}/></label><label className="block text-sm font-semibold">Cover photo<select className={`${fieldClass} mt-1`} value={newsForm.image} onChange={(e)=>setNewsForm({...newsForm,image:e.target.value})}><option value="">No photo</option>{media.map((item)=><option key={item.id} value={item.path}>{item.alt_text || item.original_name}</option>)}</select></label><label className="block text-sm font-semibold">Additional photos<select multiple className={`${fieldClass} mt-1 min-h-28`} value={newsForm.gallery} onChange={(e)=>setNewsForm({...newsForm,gallery:Array.from(e.target.selectedOptions,(option)=>option.value)})}>{media.map((item)=><option key={item.id} value={item.path}>{item.alt_text || item.original_name}</option>)}</select></label><label className="block text-sm font-semibold">Publication<select className={`${fieldClass} mt-1`} value={newsForm.status} onChange={(e)=>setNewsForm({...newsForm,status:e.target.value as "draft"|"published"})}><option value="draft">Draft</option><option value="published">Published</option></select></label><div className="flex gap-2"><button disabled={busy} className="rounded-lg bg-[#1B4332] px-4 py-2.5 text-sm font-bold text-white">Save story</button><button type="button" onClick={()=>{setNewsId(null);setNewsForm(emptyNews)}} className="rounded-lg border border-[#D8D2C7] px-4 py-2.5 text-sm font-semibold">Clear</button></div></div></form>
+          </div>}
           {tab === "media" && <div className="grid gap-8 xl:grid-cols-[minmax(280px,0.7fr)_minmax(0,1.3fr)]">
-            <div><h2 className="text-xl font-bold">Image library</h2><p className="mt-1 text-sm leading-6 text-[#68746A]">Uploads are converted to WebP, resized to a 2,400 × 1,800 maximum, and limited to 8 MB per source image.</p><form onSubmit={upload} className="mt-5 space-y-3 rounded-xl bg-[#F7F5F0] p-4"><label className="block text-sm font-semibold">Image file<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" required className={`${fieldClass} mt-1`} onChange={(e)=>setUploadFile(e.target.files?.[0] || null)}/></label><label className="block text-sm font-semibold">Alternative text<input className={`${fieldClass} mt-1`} maxLength={300} value={uploadAlt} onChange={(e)=>setUploadAlt(e.target.value)} placeholder="Describe the image for screen readers"/></label><button disabled={busy} className="flex items-center gap-2 rounded-lg bg-[#1B4332] px-4 py-2.5 text-sm font-bold text-white"><ImagePlus size={16}/>{busy?"Uploading…":"Upload image"}</button></form>
-            <h3 className="mt-7 font-bold">Public image slot</h3><p className="mt-1 text-sm leading-6 text-[#68746A]">Assign an image to a wired page slot. Existing options are listed; a custom key is useful after a developer adds it to a page template.</p><form onSubmit={saveSlot} className="mt-3 space-y-3 rounded-xl border border-[#E5DFD3] p-4"><label className="block text-sm font-semibold">Slot key<input required list="chi-image-slots" className={`${fieldClass} mt-1`} value={slotKey} onChange={(e)=>setSlotKey(e.target.value)} placeholder="home.hero"/><datalist id="chi-image-slots">{Array.from(new Set([...knownImageSlots,...slots.map((item)=>item.slot_key)])).map((key)=><option key={key} value={key}/>)}</datalist></label><label className="block text-sm font-semibold">Image<select className={`${fieldClass} mt-1`} value={slotMedia} onChange={(e)=>setSlotMedia(e.target.value)}><option value="">Clear slot</option>{media.map((item)=><option key={item.id} value={item.id}>{item.alt_text || item.original_name}</option>)}</select></label><button className="rounded-lg border border-[#D8D2C7] px-4 py-2 text-sm font-semibold">Save slot</button></form>
+            <div><h2 className="text-xl font-bold">Image library</h2><p className="mt-1 text-sm leading-6 text-[#68746A]">Your browser resizes photos to a maximum of 2,400 × 1,800 and converts them to WebP before upload. Choose a source photo up to 8 MB.</p><form onSubmit={upload} className="mt-5 space-y-3 rounded-xl bg-[#F7F5F0] p-4"><label className="block text-sm font-semibold">Image file<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" required className={`${fieldClass} mt-1`} onChange={(e)=>setUploadFile(e.target.files?.[0] || null)}/></label><label className="block text-sm font-semibold">Alternative text<input className={`${fieldClass} mt-1`} maxLength={300} value={uploadAlt} onChange={(e)=>setUploadAlt(e.target.value)} placeholder="Describe the image for screen readers"/></label><button disabled={busy} className="flex items-center gap-2 rounded-lg bg-[#1B4332] px-4 py-2.5 text-sm font-bold text-white"><ImagePlus size={16}/>{busy?"Uploading…":"Upload image"}</button></form>
+            <h3 className="mt-7 font-bold">Change a photo already on the website</h3><p className="mt-1 text-sm leading-6 text-[#68746A]">Choose the photo by its current file name, then choose an uploaded replacement. The replacement updates everywhere that photo is used.</p><form onSubmit={saveAsset} className="mt-3 space-y-3 rounded-xl border border-[#E5DFD3] p-4"><label className="block text-sm font-semibold">Website photo<select required className={`${fieldClass} mt-1`} value={assetChoice} onChange={(e)=>{setAssetChoice(e.target.value);setAssetMedia(siteAssets.find((asset)=>asset.path===e.target.value)?.media_id ? String(siteAssets.find((asset)=>asset.path===e.target.value)?.media_id) : "")}}><option value="">Select a photo</option>{siteAssets.map((asset)=><option key={asset.path} value={asset.path}>{asset.name}</option>)}</select></label>{assetChoice&&<img className="max-h-40 rounded-lg object-cover" src={siteAssets.find((asset)=>asset.path===assetChoice)?.media_path || assetChoice} alt="Selected site photo preview"/>}<label className="block text-sm font-semibold">Replacement image<select className={`${fieldClass} mt-1`} value={assetMedia} onChange={(e)=>setAssetMedia(e.target.value)}><option value="">Use original photo</option>{media.map((item)=><option key={item.id} value={item.id}>{item.alt_text || item.original_name}</option>)}</select></label><button className="rounded-lg border border-[#D8D2C7] px-4 py-2 text-sm font-semibold">Save photo change</button></form>
+            <h3 className="mt-7 font-bold">Special site image slots</h3><p className="mt-1 text-sm leading-6 text-[#68746A]">These include the logo, homepage hero, and partner logos.</p><form onSubmit={saveSlot} className="mt-3 space-y-3 rounded-xl border border-[#E5DFD3] p-4"><label className="block text-sm font-semibold">Slot key<input required list="chi-image-slots" className={`${fieldClass} mt-1`} value={slotKey} onChange={(e)=>setSlotKey(e.target.value)} placeholder="home.hero"/><datalist id="chi-image-slots">{Array.from(new Set([...knownImageSlots,...slots.map((item)=>item.slot_key)])).map((key)=><option key={key} value={key}/>)}</datalist></label><label className="block text-sm font-semibold">Image<select className={`${fieldClass} mt-1`} value={slotMedia} onChange={(e)=>setSlotMedia(e.target.value)}><option value="">Clear slot</option>{media.map((item)=><option key={item.id} value={item.id}>{item.alt_text || item.original_name}</option>)}</select></label><button className="rounded-lg border border-[#D8D2C7] px-4 py-2 text-sm font-semibold">Save slot</button></form>
               {slots.length>0&&<ul className="mt-4 space-y-1 text-xs text-[#68746A]">{slots.map((slot)=><li key={slot.slot_key}><code>{slot.slot_key}</code> → media #{slot.media_id || "none"}</li>)}</ul>}
             </div>
             <div><h3 className="font-bold">Uploaded images ({media.length})</h3><div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">{media.map((item)=><article key={item.id} className="overflow-hidden rounded-xl border border-[#E5DFD3] bg-white"><img src={item.path} alt={item.alt_text} loading="lazy" className="aspect-[4/3] w-full object-cover"/><div className="p-3"><p className="line-clamp-2 text-xs font-semibold">{item.alt_text || item.original_name || "Image"}</p><p className="mt-1 text-[10px] text-[#68746A]">{item.width}×{item.height} · {(item.bytes/1024).toFixed(0)} KB</p><label className="mt-2 block text-[10px] font-semibold">Alt text<input className={`${fieldClass} mt-1 px-2 py-1 text-xs`} value={item.alt_text} onChange={(e)=>setMedia(media.map((entry)=>entry.id===item.id?{...entry,alt_text:e.target.value}:entry))} onBlur={async(e)=>{try{await api(`/api/admin/media/${item.id}`,{method:"PUT",body:JSON.stringify({altText:e.target.value})});}catch(err){setNotice(err instanceof Error?err.message:"Could not update alt text.")}}}/></label><button type="button" onClick={()=>navigator.clipboard?.writeText(item.path)} className="mt-2 text-xs font-semibold text-[#315D3A] underline">Copy image path</button></div></article>)}</div></div>

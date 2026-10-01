@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";                                       
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "wouter";
 
 import {
@@ -146,6 +146,7 @@ const involveOptions = [
 
 interface BlogPost {
   id: number;
+  slug: string;
   title: string;
   excerpt: string;
   author: string;
@@ -167,24 +168,12 @@ export default function Home() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await fetch(`https://blog.cleanheightsinitiative.org/data/posts.json?t=${Date.now()}`);
-        if (res.ok) {
-          const data = await res.json();
-          setNews(data.slice(0, 3));
-        } else {
-          throw new Error("Subdomain fetch failed");
-        }
+        const res = await fetch("/api/news?limit=3", { cache: "no-cache" });
+        if (!res.ok) throw new Error("News service is unavailable");
+        const data = await res.json();
+        setNews(data.posts || []);
       } catch (err) {
-        console.warn("CORS/Fetch failed from subdomain, attempting local fallback...", err);
-        try {
-          const localRes = await fetch(`/data/posts.json?t=${Date.now()}`);
-          if (localRes.ok) {
-            const data = await localRes.json();
-            setNews(data.slice(0, 3));
-          }
-        } catch (localErr) {
-          console.error("Local news fallback failed:", localErr);
-        }
+        console.warn("News could not be loaded:", err);
       } finally {
         setNewsLoading(false);
       }
@@ -210,7 +199,7 @@ export default function Home() {
       >
         {/* Real High-Resolution Raw Photograph */}
         <div className="absolute inset-0 z-0">
-          <img
+          <ManagedImage
             src={heroImage.src}
             alt={heroImage.alt || "Kipgorgotich Escarpment"}
             className="w-full h-full object-cover transform-gpu backface-hidden"
@@ -228,7 +217,7 @@ export default function Home() {
         {/* Hero content area - perfectly centered and beautifully weighted */}
         <div className="relative z-10 container mx-auto px-4 text-center pt-28 pb-20 flex flex-col items-center justify-center">
           <div className="max-w-4xl mx-auto flex flex-col items-center">
-            
+
             {/* Elegant physical badge with micro-border */}
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2 mb-8 shadow-sm">
               <Leaf size={14} className="text-[var(--chi-leaf)] animate-pulse" />
@@ -293,20 +282,18 @@ export default function Home() {
                   const featured = news[0];
                   return (
                     <a
-                      href={`https://blog.cleanheightsinitiative.org/?post=${featured.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={`/news/${featured.slug}`}
                       aria-label={`Read story: ${featured.title}`}
                       className="group cursor-pointer relative h-[450px] rounded-3xl overflow-hidden border border-[#E5DFD3]/80 shadow-md flex flex-col justify-end bg-[var(--chi-forest)]"
                     >
                       <img
-                        src={featured.image.startsWith("images/") ? `https://blog.cleanheightsinitiative.org/${featured.image}` : featured.image}
+                        src={featured.image}
                         alt={featured.title}
                         className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-[1.03] transition-transform duration-[1.5s] ease-out"
                         loading="eager"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[var(--chi-forest)]/95 via-[var(--chi-forest)]/45 to-transparent z-[1]" />
-                      
+
                       <div className="relative z-10 p-8 sm:p-10 flex flex-col items-start text-white">
                         <span className="bg-[var(--chi-terracotta)] text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-md mb-4 shadow-sm">
                           {featured.category}
@@ -336,14 +323,12 @@ export default function Home() {
                   {news.slice(1, 3).map((post, idx) => (
                     <a
                       key={post.id}
-                      href={`https://blog.cleanheightsinitiative.org/?post=${post.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={`/news/${post.slug}`}
                       className={`group cursor-pointer flex gap-5 items-start transition-all ${idx > 0 ? "pt-8" : ""}`}
                     >
                       <div className="w-24 h-24 rounded-2xl overflow-hidden bg-[var(--chi-forest)] flex-shrink-0 border border-[#E5DFD3]/40">
                         <img
-                          src={post.image.startsWith("images/") ? `https://blog.cleanheightsinitiative.org/${post.image}` : post.image}
+                          src={post.image}
                           alt={post.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"
@@ -375,9 +360,7 @@ export default function Home() {
 
                 <div className="pt-6 border-t border-[#E5DFD3]/60">
                   <a
-                    href="https://blog.cleanheightsinitiative.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="/news"
                     className="w-full text-center py-3.5 border border-[#E5DFD3] text-[var(--chi-forest)] hover:bg-[var(--chi-forest)] hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300 inline-flex items-center justify-center gap-2"
                   >
                     Explore All Field Stories
@@ -430,7 +413,7 @@ export default function Home() {
             {differentiators.map(({ icon: Icon, title, desc }, i) => (
               <div
                 key={title}
-                className={`diff-card chi-reveal chi-delay-${i + 1} 
+                className={`diff-card chi-reveal chi-delay-${i + 1}
                   ${i % 2 !== 0 ? "lg:translate-y-8" : ""}`}
               >
                 <div className="mb-6 inline-flex p-3 bg-[var(--chi-warm-white)] organic-radius border border-[var(--chi-terracotta)]/10 shadow-sm">
@@ -477,7 +460,7 @@ export default function Home() {
             {pillars.map(({ icon: Icon, number, title, items }, i) => (
               <div
                 key={title}
-                className={`paper-card p-10 rounded-3xl chi-reveal chi-delay-${i + 1} 
+                className={`paper-card p-10 rounded-3xl chi-reveal chi-delay-${i + 1}
                   ${i === 1 ? "md:-mt-12 md:mb-12 shadow-xl z-20" : "md:mt-0 z-10"}`}
               >
                 <div className="flex items-center gap-4 mb-8">
@@ -528,7 +511,7 @@ export default function Home() {
                 <div className="absolute -top-6 -left-6 w-24 h-24 border-t-2 border-l-2 border-[var(--chi-terracotta)] z-0 rounded-tl-3xl opacity-40" />
                 <div className="absolute -bottom-6 -right-6 w-24 h-24 border-b-2 border-r-2 border-[var(--chi-sage)] z-0 rounded-br-3xl opacity-40" />
                 <div className="relative z-10 overflow-hidden rounded-3xl shadow-2xl">
-                  <img
+                  <ManagedImage
                     src={communityImage.src}
                     alt={communityImage.alt || "Community women working at the CHI indigenous tree nursery"}
                     className="w-full h-[520px] object-cover hover:scale-105 transition-transform duration-1000"
@@ -577,9 +560,9 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row min-h-[700px]">
           {/* Visual Column - Full Bleed */}
           <div className="w-full lg:w-1/2 relative min-h-[500px] chi-reveal-left">
-            <img 
-              src="/milestones/escarpment/eco-planting.jpg" 
-              alt="Foreign visitors interacting with local community guides" 
+            <ManagedImage
+              src="/milestones/escarpment/eco-planting.jpg"
+              alt="Foreign visitors interacting with local community guides"
               className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent lg:hidden" />
@@ -598,7 +581,7 @@ export default function Home() {
               <p className="text-white/80 text-lg leading-relaxed mb-10">
                 At Clean Heights Initiative, we believe the best way to protect the escarpment is by showing its value to the world. We actively train local youths to act as professional tour guides, equipping them to lead foreign visitors through these breathtaking landscapes. This not only creates sustainable income but transforms our youth into lifelong environmental ambassadors.
               </p>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[
                   { title: "Youth Tour Guides", desc: "Equipping young people with professional hospitality and eco-tourism skills." },
@@ -652,8 +635,8 @@ export default function Home() {
               </div>
             </div>
             <div className="lg:col-span-7 chi-reveal-scale">
-              <ComparisonSlider 
-                beforeImage="/milestones/kipgorgotich/trough-dirty.jpg" 
+              <ComparisonSlider
+                beforeImage="/milestones/kipgorgotich/trough-dirty.jpg"
                 afterImage="/milestones/kipgorgotich/trough-clean.jpg"
                 beforeLabel="Before"
                 afterLabel="After"
@@ -715,7 +698,7 @@ export default function Home() {
               <div className="relative">
                 <div className="absolute -inset-3 border-2 border-[var(--chi-terracotta)]/20 z-0 rounded-2xl" />
                 <div className="relative z-10 overflow-hidden rounded-2xl shadow-2xl h-[520px]">
-                  <img
+                  <ManagedImage
                     src="/founder-portrait.jpg"
                     alt="Cynthia Jelagat — Founder and Chairperson of Clean Heights Initiative"
                     className="w-full h-full object-cover"

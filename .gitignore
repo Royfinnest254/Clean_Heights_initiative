@@ -114,6 +114,9 @@ storage/media/*
 blog_subdomain/admin/config.php
 blog_subdomain.zip
 production_build_final.zip
+namecheap-php/Clean_Heights_Namecheap_Upload.zip
+namecheap-php/release/
+namecheap-php/cms-config.php
 dist_ultra_optimized/
 oldhome.txt
 .aiignore

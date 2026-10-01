@@ -8,14 +8,21 @@
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store, private');
+header('X-Content-Type-Options: nosniff');
 
-// Only allow POST requests
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed. Please use POST.']);
+function reply(int $status, array $body): never {
+    http_response_code($status);
+    echo json_encode($body, JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }
+function safe_html(string $value): string {
+    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+// Only allow POST requests
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') reply(405, ['error' => 'Method not allowed. Please use POST.']);
 
 // Get JSON data from request body
 $json = file_get_contents('php://input');
@@ -32,35 +39,31 @@ $from_email = "info@cleanheightsinitiative.org"; // Must be an account on your N
 $website_name = "Clean Heights Initiative";
 
 // Extract and sanitize fields
-$name = isset($data['from_name']) ? strip_tags(trim($data['from_name'])) : '';
-$email = isset($data['from_email']) ? filter_var(trim($data['from_email']), FILTER_SANITIZE_EMAIL) : '';
-$phone = isset($data['phone']) ? strip_tags(trim($data['phone'])) : 'Not provided';
-$org = isset($data['organisation']) ? strip_tags(trim($data['organisation'])) : 'Not provided';
-$subject_line = isset($data['subject']) ? strip_tags(trim($data['subject'])) : 'New Inquiry';
-$message_body = isset($data['message']) ? strip_tags(trim($data['message'])) : '';
+$nameRaw = trim((string)($data['from_name'] ?? ''));
+$email = trim((string)($data['from_email'] ?? ''));
+$phoneRaw = trim((string)($data['phone'] ?? '')) ?: 'Not provided';
+$orgRaw = trim((string)($data['organisation'] ?? '')) ?: 'Not provided';
+$subjectRaw = preg_replace('/[\r\n]+/', ' ', trim((string)($data['subject'] ?? 'New Inquiry'))) ?: 'New Inquiry';
+$messageRaw = trim((string)($data['message'] ?? ''));
+$name = safe_html(substr(strip_tags($nameRaw), 0, 160));
+$phone = safe_html(substr(strip_tags($phoneRaw), 0, 80));
+$org = safe_html(substr(strip_tags($orgRaw), 0, 180));
+$subject_line = safe_html(substr(strip_tags($subjectRaw), 0, 180));
+$message_body = safe_html(substr(strip_tags($messageRaw), 0, 10000));
 
 // Honeypot check (anti-spam)
 if (!empty($data['website'])) {
     // Silent fail for bots
-    echo json_encode(['success' => true, 'message' => 'Message processed.']);
-    exit;
+    reply(200, ['success' => true, 'message' => 'Message processed.']);
 }
 
 // Basic Validation
-if (empty($name) || empty($email) || empty($message_body)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Please fill in all required fields (Name, Email, Message).']);
-    exit;
-}
+if ($name === '' || $email === '' || $messageRaw === '') reply(400, ['error' => 'Please fill in all required fields (Name, Email, Message).']);
 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid email address.']);
-    exit;
-}
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 254) reply(400, ['error' => 'Invalid email address.']);
 
 // Prepare HTML Email Content
-$email_subject = "[$website_name] $subject_line from $name";
+$email_subject = "[$website_name] " . substr(strip_tags($subjectRaw), 0, 180) . " from " . substr(strip_tags($nameRaw), 0, 160);
 $email_content = "
 <!DOCTYPE html>
 <html>
@@ -72,7 +75,7 @@ $email_content = "
     <table border='0' cellpadding='0' cellspacing='0' width='100%' style='table-layout: fixed;'>
         <tr>
             <td align='center' style='padding: 40px 0 20px 0;'>
-                <img src='https://d2xsxph8kpxj0f.cloudfront.net/310519663425159343/Uj3DVokpwmZufniMNHSrGB/chi-logo-final_2d6d3417.png' alt='Clean Heights Initiative' width='120' style='display: block; width: 120px; height: auto;'>
+                <img src='https://cleanheightsinitiative.org/chi-logo.svg' alt='Clean Heights Initiative' width='120' style='display: block; width: 120px; height: auto;'>
             </td>
         </tr>
         <tr>
@@ -133,7 +136,7 @@ $email_content = "
 
 // Email Headers
 $headers = "From: $website_name <$from_email>\r\n";
-$headers .= "Reply-To: $name <$email>\r\n";
+$headers .= "Reply-To: $email\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 $headers .= "X-Mailer: PHP/" . phpversion();
@@ -152,7 +155,7 @@ $visitor_content = "
     <table border='0' cellpadding='0' cellspacing='0' width='100%' style='table-layout: fixed;'>
         <tr>
             <td align='center' style='padding: 40px 0 20px 0;'>
-                <img src='https://d2xsxph8kpxj0f.cloudfront.net/310519663425159343/Uj3DVokpwmZufniMNHSrGB/chi-logo-final_2d6d3417.png' alt='Clean Heights Initiative' width='120' style='display: block; width: 120px; height: auto;'>
+                <img src='https://cleanheightsinitiative.org/chi-logo.svg' alt='Clean Heights Initiative' width='120' style='display: block; width: 120px; height: auto;'>
             </td>
         </tr>
         <tr>
@@ -181,7 +184,7 @@ $visitor_content = "
                                 <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">
                                     <tr>
                                         <td style=\"padding-right: 15px; border-right: 2px solid #52B788;\">
-                                            <img src=\"https://d2xsxph8kpxj0f.cloudfront.net/310519663425159343/Uj3DVokpwmZufniMNHSrGB/chi-logo-final_2d6d3417.png\" width=\"60\" alt=\"Logo\">
+                                            <img src=\"https://cleanheightsinitiative.org/chi-logo.svg\" width=\"60\" alt=\"Logo\">
                                         </td>
                                         <td style=\"padding-left: 15px;\">
                                             <p style=\"margin: 0; font-weight: 700; color: #1B4332; font-size: 14px;\">Clean Heights Initiative</p>
@@ -216,9 +219,8 @@ if (mail($to_email, $email_subject, $email_content, $headers)) {
     // Send auto-reply to visitor
     mail($email, $visitor_subject, $visitor_content, $visitor_headers);
     
-    echo json_encode(['success' => true, 'message' => 'Your message has been sent successfully!']);
+    reply(200, ['success' => true, 'message' => 'Your message has been sent successfully!']);
 } else {
-    http_response_code(500);
-    echo json_encode(['error' => 'The server was unable to send your message. Please try again later or contact us directly at ' . $to_email]);
+    reply(500, ['error' => 'The server was unable to send your message. Please try again later or contact us directly at ' . $to_email]);
 }
 ?>

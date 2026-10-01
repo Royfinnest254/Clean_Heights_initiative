@@ -1,0 +1,38 @@
+Options -Indexes
+DirectoryIndex index.html
+
+<FilesMatch "(^cms-config.*$|^\.env|^\.git|composer\.(json|lock)|package(-lock)?\.json|tsconfig\.json|vite\.config\..*|\.gitignore)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:[0-9]+)?$ [NC]
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+  RewriteRule ^media/([A-Za-z0-9._-]+)$ api/index.php?media=$1 [QSA,L]
+  RewriteCond %{REQUEST_URI} !^/api/index\.php$ [NC]
+  RewriteRule ^api(?:/.*)?$ api/index.php [QSA,L]
+  RewriteRule ^sitemap\.xml$ sitemap-route.php [QSA,L]
+  RewriteRule ^news/([A-Za-z0-9_-]+)/?$ news-route.php?slug=$1 [QSA,L]
+  RewriteRule ^projects/?$ /programs [R=301,L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html?)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(woff2|webp|png|jpe?g|svg|ico)$">
+    Header set Cache-Control "public, max-age=86400, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/xml image/svg+xml
+</IfModule>

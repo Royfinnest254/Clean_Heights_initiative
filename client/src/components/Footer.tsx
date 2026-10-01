@@ -3,7 +3,7 @@ import { useSiteImage } from "@/contexts/SiteImagesContext";
 import { Mail, Phone, Instagram, Linkedin, MapPin, Heart } from "lucide-react";
 
 
-const CHI_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663425159343/Uj3DVokpwmZufniMNHSrGB/chi-logo-final_2d6d3417.png";
+const CHI_LOGO = "/chi-logo.svg";
 
 const quickLinks = [
   { label: "Home", href: "/" },

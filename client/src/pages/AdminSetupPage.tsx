@@ -25,7 +25,7 @@ export default function AdminSetupPage() {
     event.preventDefault();
     setNotice("");
     if (form.password !== form.confirmPassword) return setNotice("The passwords do not match.");
-    if (form.password.length < 14) return setNotice("Choose a password with at least 14 characters.");
+      if (form.password.length < 14 || new TextEncoder().encode(form.password).length > 72) return setNotice("Choose a password with 14 to 72 characters.");
     setBusy(true);
     try {
       const response = await fetch("/api/admin/setup", {
@@ -38,7 +38,7 @@ export default function AdminSetupPage() {
       if (!response.ok) throw new Error(data.error || `Setup failed (${response.status}).`);
       setDone(true);
       setAvailable(false);
-      setNotice(data.message || "Administrator created. Remove the setup key from cPanel, restart the app, then sign in.");
+      setNotice(data.message || "Administrator password saved. Remove the setup key from cms-config.php, then sign in.");
       setForm({ setupKey: "", email: "", displayName: "", password: "", confirmPassword: "" });
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Could not create the administrator.");
@@ -52,23 +52,23 @@ export default function AdminSetupPage() {
       <section className="w-full max-w-lg rounded-2xl border border-[#E5DFD3] bg-white p-6 shadow-xl sm:p-8">
         <Link href="/admin" className="text-sm font-semibold text-[#477A51] hover:underline">← Content portal sign-in</Link>
         <div className="mt-6 flex h-12 w-12 items-center justify-center rounded-xl bg-[#EAF1E8] text-[#315D3A]"><ShieldCheck /></div>
-        <h1 className="mt-5 text-2xl font-bold text-[#1B4332]">First administrator setup</h1>
+        <h1 className="mt-5 text-2xl font-bold text-[#1B4332]">Administrator setup</h1>
         {available === null ? <p className="mt-3 text-sm text-[#68746A]">Checking whether first-time setup is available…</p> : !available ? (
           <div className="mt-4 rounded-lg bg-[#F7F5F0] p-4 text-sm leading-6 text-[#48574D]">
-            <p>{done ? notice : "First-time setup is closed. Either an administrator already exists, or the hosting setup key is missing."}</p>
+            <p>{done ? notice : "Setup or recovery is closed. The private setup key may be missing."}</p>
             <Link href="/admin" className="mt-4 inline-block font-bold text-[#315D3A] underline">Go to sign in</Link>
           </div>
         ) : (
           <>
-            <p className="mt-2 text-sm leading-6 text-[#68746A]">This page works only before the first administrator is created. Enter the temporary setup key you added in the Node.js app settings in cPanel.</p>
+            <p className="mt-2 text-sm leading-6 text-[#68746A]">Create the first administrator, or recover the existing account while keeping saved CMS content. Enter the temporary setup key from cms-config.php.</p>
             {notice && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{notice}</p>}
             <form onSubmit={submit} className="mt-5 space-y-4">
               <label className="block text-sm font-semibold">Temporary setup key<input required type="password" autoComplete="off" className={`${fieldClass} mt-1`} value={form.setupKey} onChange={(e) => setForm({ ...form, setupKey: e.target.value })} /></label>
               <label className="block text-sm font-semibold">Administrator name<input required minLength={2} maxLength={160} autoComplete="name" className={`${fieldClass} mt-1`} value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} /></label>
               <label className="block text-sm font-semibold">Administrator email<input required type="email" autoComplete="email" className={`${fieldClass} mt-1`} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></label>
-              <label className="block text-sm font-semibold">New password (14 characters minimum)<input required minLength={14} maxLength={1024} type="password" autoComplete="new-password" className={`${fieldClass} mt-1`} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></label>
-              <label className="block text-sm font-semibold">Type the password again<input required minLength={14} maxLength={1024} type="password" autoComplete="new-password" className={`${fieldClass} mt-1`} value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} /></label>
-              <button disabled={busy} className="w-full rounded-lg bg-[#1B4332] px-4 py-3 font-bold text-white disabled:opacity-50">{busy ? "Creating administrator…" : "Create first administrator"}</button>
+              <label className="block text-sm font-semibold">New password (14–72 characters)<input required minLength={14} maxLength={72} type="password" autoComplete="new-password" className={`${fieldClass} mt-1`} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></label>
+              <label className="block text-sm font-semibold">Type the password again<input required minLength={14} maxLength={72} type="password" autoComplete="new-password" className={`${fieldClass} mt-1`} value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} /></label>
+              <button disabled={busy} className="w-full rounded-lg bg-[#1B4332] px-4 py-3 font-bold text-white disabled:opacity-50">{busy ? "Saving administrator…" : "Create or recover administrator"}</button>
             </form>
           </>
         )}

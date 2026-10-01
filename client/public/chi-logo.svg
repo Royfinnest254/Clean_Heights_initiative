@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Clean Heights Initiative</title>
+  <circle cx="64" cy="64" r="61" fill="#fff"/>
+  <circle cx="64" cy="64" r="55" fill="none" stroke="#1b6b3d" stroke-width="7"/>
+  <path d="M24 78 48 55l17 16 17-18 23 25" fill="none" stroke="#1b6b3d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <path d="M76 41c11-17 27-18 37-17-2 15-10 29-28 31-4-1-7-6-9-14Z" fill="#59a848"/>
+  <path d="M78 50c6-8 13-14 24-19" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
+</svg>

@@ -39,7 +39,7 @@ export default function CookieNotice() {
         <div className="max-w-xl">
           <h2 className="text-base font-bold text-[var(--chi-forest)]">Essential browser storage</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--chi-grey)]">This site uses browser storage to remember that you closed this notice and to save display preferences. It does not currently run analytics or advertising trackers.</p>
-          {settingsOpen && <p className="mt-2 text-sm leading-6 text-[var(--chi-grey)]">Optional analytics and advertising storage are not active. External fonts and images may still be requested from their providers. Read the <Link href="/cookies" className="font-semibold text-[var(--chi-leaf)] underline">Cookie Notice</Link> for details.</p>}
+          {settingsOpen && <p className="mt-2 text-sm leading-6 text-[var(--chi-grey)]">Analytics and advertising are not active. The Google Map connects to Google only if you choose to load it on the Contact page. Read the <Link href="/cookies" className="font-semibold text-[var(--chi-leaf)] underline">Cookie Notice</Link> for details.</p>}
           <Link href="/privacy" className="mt-2 inline-block text-sm font-semibold text-[var(--chi-leaf)] underline">Privacy Notice</Link>
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">

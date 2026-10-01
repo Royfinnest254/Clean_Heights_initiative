@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import Lightbox from "@/components/Lightbox";
 import TopographicBg from "@/components/TopographicBg";
 import type { Milestone } from "@shared/milestones";
+import { ManagedImage } from "@/contexts/SiteImagesContext";
 
 /* ── Scroll reveal — re-runs when deps change ── */
 function useScrollReveal(dep: any) {
@@ -55,7 +56,7 @@ function MilestoneImage({
       {!loaded && (
         <div className="absolute inset-0 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 bg-[length:200%_100%] animate-pulse min-h-[220px]" style={{ animationDuration: "1.5s" }} />
       )}
-      <img
+      <ManagedImage
         src={src}
         alt={alt}
         onLoad={() => setLoaded(true)}

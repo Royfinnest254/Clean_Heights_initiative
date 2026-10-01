@@ -19,6 +19,9 @@ export default function SeoHead() {
 
   useEffect(() => {
     const pathname = window.location.pathname.replace(/\/$/, "") || "/";
+    // Per-story metadata comes from the same-origin news API and the PHP
+    // metadata route; do not replace it with the generic not-found metadata.
+    if (pathname.startsWith("/news/")) return;
     const page = getPageSeo(pathname);
     const canonical = `${origin}${pathname === "/" ? "/" : pathname}`;
     document.title = page.title;

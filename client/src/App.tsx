@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -5,23 +6,24 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
-import About from "./pages/About";
-import Milestones from "./pages/Milestones";
-import Contact from "./pages/Contact";
-import Projects from "./pages/Projects";
-import LegalPage from "./pages/LegalPage";
 import CookieNotice from "./components/CookieNotice";
-import AdminPage from "./pages/AdminPage";
-import Programs from "./pages/Programs";
 import { SiteImagesProvider } from "./contexts/SiteImagesContext";
-import Team from "./pages/Team";
-import EcoTourism from "./pages/EcoTourism";
-import AdminSetupPage from "./pages/AdminSetupPage";
 import SeoHead from "./components/SeoHead";
+const About = lazy(() => import("./pages/About"));
+const Milestones = lazy(() => import("./pages/Milestones"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Projects = lazy(() => import("./pages/Projects"));
+const LegalPage = lazy(() => import("./pages/LegalPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const Programs = lazy(() => import("./pages/Programs"));
+const Team = lazy(() => import("./pages/Team"));
+const EcoTourism = lazy(() => import("./pages/EcoTourism"));
+const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
+const NewsPage = lazy(() => import("./pages/NewsPage"));
 
 function Router() {
   return (
-    <Switch>
+    <Suspense fallback={<main className="min-h-screen bg-[#F7F5F0] p-8 text-[#48574D]">Loading page…</main>}><Switch>
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
       <Route path="/team" component={Team} />
@@ -34,12 +36,14 @@ function Router() {
       <Route path="/terms" component={() => <LegalPage page="terms" />} />
       <Route path="/accessibility" component={() => <LegalPage page="accessibility" />} />
       <Route path="/programs" component={Programs} />
+      <Route path="/news" component={NewsPage} />
+      <Route path="/news/:slug" component={NewsPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/admin/setup" component={AdminSetupPage} />
 
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
-    </Switch>
+    </Switch></Suspense>
   );
 }
 

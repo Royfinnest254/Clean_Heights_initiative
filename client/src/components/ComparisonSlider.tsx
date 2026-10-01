@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { ManagedImage } from "@/contexts/SiteImagesContext";
 
 interface ComparisonSliderProps {
   beforeImage: string;
@@ -36,7 +37,7 @@ export default function ComparisonSlider({
       onTouchMove={onTouchMove}
     >
       {/* After Image (Background) */}
-      <img
+      <ManagedImage
         src={afterImage}
         alt="After restoration"
         className="w-full aspect-[16/10] object-cover pointer-events-none"
@@ -47,7 +48,7 @@ export default function ComparisonSlider({
         className="absolute inset-0 w-full h-full"
         style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
       >
-        <img
+        <ManagedImage
           src={beforeImage}
           alt="Before restoration"
           className="w-full h-full object-cover pointer-events-none"

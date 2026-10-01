@@ -28,6 +28,11 @@ export const seoPages: Record<string, PageSeo> = {
     title: "Programs and Activities | Clean Heights Initiative",
     description: "Explore Clean Heights Initiative programs and community activities in Iten and Elgeyo Marakwet, Kenya, including local environmental and water-source work.",
   },
+  "/news": {
+    title: "Latest News and Community Stories | Clean Heights Initiative",
+    description: "Read field updates and community stories from Clean Heights Initiative in Iten, Elgeyo Marakwet, Kenya.",
+    image: "/hero-bg.jpg",
+  },
   "/milestones": {
     title: "Community Field Work and Milestones | Clean Heights Initiative",
     description: "See documented community activities and field milestones from Clean Heights Initiative in Iten and Elgeyo Marakwet, Kenya.",
